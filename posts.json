@@ -1,0 +1,23 @@
+{
+ "blog": {
+  "title": "TS2k",
+  "desc": "ts2k 님의 블로그 입니다.",
+  "link": "https://ts2k.tistory.com/"
+ },
+ "posts": [
+  {
+   "title": "[개발 일지] 3D 틸트 홀로그램 카드 iOS 앱 HoloCards 만들기",
+   "link": "https://ts2k.tistory.com/entry/%EA%B0%9C%EB%B0%9C-%EC%9D%BC%EC%A7%80-3D-%ED%8B%B8%ED%8A%B8-%ED%99%80%EB%A1%9C%EA%B7%B8%EB%9E%A8-%EC%B9%B4%EB%93%9C-iOS-%EC%95%B1-HoloCards-%EB%A7%8C%EB%93%A4%EA%B8%B0-1",
+   "date": "2026-11-23",
+   "categories": [
+    "프로젝트",
+    "Coremotion",
+    "ios",
+    "METAL",
+    "SwiftUI",
+    "개발일지"
+   ],
+   "html": "폰을 기울이면 카드가 3D로 기울어지고, 홀로그램 광택이 빛을 따라 움직이는 iOS 앱 HoloCards를 만들고 있습니다. 실물 트레이딩 카드의 반짝이는 느낌을 화면에서 재현해 보는 게 목표입니다.\n\n개인 학습용 프로젝트입니다. 카드 데이터와 이미지는 공개 API에서 불러오며, 카드 이미지의 저작권은 원저작자에게 있습니다.\n\n1. 만들게 된 동기\n\n실물 카드를 빛에 비춰 볼 때의 반짝임을 폰 기울기로 재현해 보고 싶었습니다.\nSwiftUI만으로는 해 .."
+  }
+ ]
+}

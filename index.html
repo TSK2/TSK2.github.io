@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ko" data-feed="posts.json">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TS2k — 개발·공부·일상 블로그</title>
+<meta name="description" content="개발 기록, 공부한 것, 소소한 일상을 맥 데스크톱처럼 둘러보는 블로그.">
+<meta name="author" content="김태섭 (TSK2)">
+<meta name="theme-color" content="#0b1020">
+<meta property="og:type" content="website"><meta property="og:title" content="TS2k — 개발·공부·일상 블로그"><meta property="og:description" content="맥 데스크톱처럼 둘러보는 블로그">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Crect x=%271%27 y=%271%27 width=%2722%27 height=%2722%27 rx=%277%27 fill=%27%230a84ff%27/%3E%3Cpath d=%27M7 8.5h10M12 8.5v9%27 stroke=%27white%27 stroke-width=%272.6%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","name":"TS2k","url":"https://tsk2.github.io/","sameAs":["https://ts2k.tistory.com/"]}</script>
+<style>
+:root{
+  --accent:#22d3a6;--accent-rgb:34,211,166;
+  --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;--mono:"SF Mono","JetBrains Mono",ui-monospace,monospace;
+  --menubar:26px;
+}
+:root,[data-theme=dark]{
+  --bg:#05080d;--win:#24262d;--win-solid:#1e2026;--side:#202228;--content:#17191e;
+  --bar:rgba(20,22,28,.45);--line:rgba(255,255,255,.09);--text:#ececf0;--muted:#9a9ca6;--hover:rgba(255,255,255,.08);
+  --code:#0b0d12;--dock:rgba(40,42,50,.38);--menu:rgba(38,40,48,.82);--shadow:0 22px 70px rgba(0,0,0,.55),0 0 0 .5px rgba(0,0,0,.8);
+}
+[data-theme=light]{
+  --bg:#dfe6ee;--win:#f6f6f8;--win-solid:#f6f6f8;--side:#ececef;--content:#ffffff;
+  --bar:rgba(255,255,255,.4);--line:rgba(0,0,0,.1);--text:#1d1d1f;--muted:#6e6e73;--hover:rgba(0,0,0,.06);
+  --code:#f3f4f6;--dock:rgba(255,255,255,.35);--menu:rgba(240,240,243,.85);--shadow:0 22px 70px rgba(0,0,0,.25),0 0 0 .5px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.4 var(--font);user-select:none;-webkit-user-select:none;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:default}
+#wall{position:fixed;inset:0;width:100%;height:100%}
+#desktop{position:fixed;inset:var(--menubar) 0 0 0}
+.blur{backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%)}
+
+/* ===== menu bar ===== */
+#menubar{position:fixed;top:0;left:0;right:0;height:var(--menubar);background:var(--bar);display:flex;align-items:center;padding:0 8px;z-index:9000;font-size:13px;color:var(--text)}
+[data-theme=dark] #menubar{color:#fff}
+#menubar .mi{padding:0 9px;height:22px;border-radius:5px;display:flex;align-items:center;white-space:nowrap}
+#menubar .mi:hover,#menubar .mi.on{background:rgba(255,255,255,.22)}
+[data-theme=light] #menubar .mi:hover,[data-theme=light] #menubar .mi.on{background:rgba(0,0,0,.1)}
+#menubar .app{font-weight:700}
+#menubar .sp{flex:1}
+#mbClock{font-variant-numeric:tabular-nums}
+.drop{position:fixed;top:calc(var(--menubar) + 2px);min-width:230px;padding:5px;background:var(--menu);border:.5px solid var(--line);border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.35);z-index:9600;display:none;font-size:13px}
+.drop.open{display:block}
+.drop button{display:flex;justify-content:space-between;gap:24px;width:100%;padding:3px 10px;border-radius:4px;text-align:left;line-height:1.6}
+.drop button:hover:not(:disabled){background:var(--accent);color:#04110d}
+.drop button:disabled{opacity:.4}
+.drop kbd{font-family:var(--font);opacity:.6}
+.drop button:hover kbd{opacity:.85}
+.drop hr{border:0;border-top:1px solid var(--line);margin:5px 8px}
+.drop .chk{width:14px;display:inline-block}
+
+/* ===== desktop icons (right side like macOS) ===== */
+.icon{position:absolute;width:92px;padding:4px;text-align:center;cursor:default}
+.icon .glyph{width:58px;height:58px;margin:0 auto 3px;padding:4px;border-radius:6px;border:2px solid transparent;display:grid;place-items:center;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))}
+.icon span{display:inline-block;padding:1px 5px;border-radius:4px;font-size:12px;font-weight:500;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);word-break:keep-all;line-height:1.3}
+.icon.sel .glyph{background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.35)}
+.icon.sel span{background:var(--accent);color:#04110d;text-shadow:none}
+#selbox{position:absolute;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.14);display:none;pointer-events:none;z-index:5}
+
+/* ===== windows ===== */
+.win{position:absolute;min-width:320px;min-height:200px;background:var(--win);border-radius:11px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;transform-origin:center;transition:transform .32s cubic-bezier(.3,.7,.2,1),opacity .32s}
+.win.opening{animation:open .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes open{from{transform:scale(.92);opacity:0}}
+.win.max{left:0!important;top:0!important;width:100%!important;height:calc(100% - 0px)!important;border-radius:0}
+.win.hidden{visibility:hidden;pointer-events:none}
+.win:not(.focus) .tl b{background:#55575e!important}
+[data-theme=light] .win:not(.focus) .tl b{background:#d0d0d3!important}
+.win:not(.focus) .wtitle{opacity:.55}
+.tbar{height:38px;flex:none;display:flex;align-items:center;position:relative;padding:0 12px;border-bottom:.5px solid var(--line)}
+.tl{display:flex;gap:8px;z-index:2}
+.tl b{width:12px;height:12px;border-radius:50%;display:grid;place-items:center;font-size:9px;line-height:1;color:transparent;font-weight:800}
+.tl b.r{background:#ff5f57}.tl b.y{background:#febc2e}.tl b.g{background:#28c840}
+.tl:hover b{color:rgba(0,0,0,.55)}
+.wtitle{position:absolute;left:0;right:0;text-align:center;font-weight:600;font-size:13px;pointer-events:none;padding:0 90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{margin-left:auto;display:flex;gap:4px;z-index:2;align-items:center}
+.wbody{flex:1;overflow:auto;position:relative;background:var(--content)}
+.rz{position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize;z-index:3}
+.tbtn{height:26px;min-width:28px;padding:0 6px;border-radius:6px;display:grid;place-items:center;color:var(--muted)}
+.tbtn:hover{background:var(--hover);color:var(--text)}
+.tbtn.on{background:var(--hover);color:var(--text)}
+.tbtn:disabled{opacity:.3}
+.sfield{height:26px;width:170px;display:flex;align-items:center;gap:6px;padding:0 8px;border-radius:6px;background:var(--hover);color:var(--muted)}
+.sfield input{flex:1;min-width:0;background:none;border:0;outline:none;color:var(--text);font:12.5px var(--font)}
+
+/* ===== dock ===== */
+#dock{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:2px;padding:5px 6px;height:66px;border-radius:18px;background:var(--dock);border:.5px solid rgba(255,255,255,.22);box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:8500;transition:transform .25s}
+.dk{position:relative;width:52px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;transition:width .12s,height .12s;flex:none}
+.dk .ico{width:100%;height:100%;border-radius:23%;overflow:hidden;transition:transform .15s}
+.dk:active .ico{filter:brightness(.7)}
+.dk .run{position:absolute;bottom:-5px;width:4px;height:4px;border-radius:50%;background:var(--text);opacity:0}
+.dk.running .run{opacity:.85}
+.dk .tip{position:absolute;bottom:calc(100% + 12px);padding:3px 10px;border-radius:6px;background:var(--menu);border:.5px solid var(--line);white-space:nowrap;font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .1s}
+.dk:hover .tip{opacity:1}
+.dk.bounce .ico{animation:bounce .5s ease 2}
+@keyframes bounce{40%{transform:translateY(-18px)}}
+[data-theme=light] .dk[data-app=trash] .ico{filter:drop-shadow(0 0 1px #64748b) brightness(.85)}
+.dsep{width:1px;align-self:stretch;margin:4px 5px;background:rgba(255,255,255,.3)}
+
+/* ===== app icons (original, mac-like squircles) ===== */
+.ai{width:100%;height:100%;display:grid;place-items:center}
+
+/* ===== Finder ===== */
+.finder{display:flex;height:100%}
+.finder aside{width:180px;flex:none;background:var(--side);padding:10px 8px;overflow:auto;border-right:.5px solid var(--line)}
+.finder aside h5{font-size:11px;color:var(--muted);font-weight:600;margin:10px 8px 4px}
+.finder aside button{display:flex;align-items:center;gap:8px;width:100%;padding:4px 8px;border-radius:6px;text-align:left;font-size:13px}
+.finder aside button:hover{background:var(--hover)}
+.finder aside button.on{background:rgba(var(--accent-rgb),.22)}
+.finder aside .tagdot{width:10px;height:10px;border-radius:50%;flex:none;margin:0 3px}
+.finder .main{flex:1;display:flex;flex-direction:column;min-width:0}
+.finder .grid{flex:1;overflow:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px 6px;align-content:start}
+.fi{text-align:center;padding:6px 4px;border-radius:8px}
+.fi:hover{background:var(--hover)}
+.fi.sel{background:rgba(var(--accent-rgb),.2)}
+.fi .th{width:64px;height:78px;margin:0 auto 6px;position:relative}
+.fi .nm{font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.thumb{width:64px;height:78px;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);padding:7px 6px;text-align:left;overflow:hidden;position:relative}
+.thumb i{display:block;height:3px;border-radius:2px;background:#d6d8dd;margin-bottom:4px}
+.thumb .tt{font-size:6.5px;line-height:1.25;font-weight:700;color:#222;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.thumb .band{position:absolute;left:0;top:0;bottom:0;width:3px}
+.list{flex:1;overflow:auto}
+.lrow{display:grid;grid-template-columns:1fr 110px 100px;gap:10px;align-items:center;padding:4px 14px;font-size:12.5px}
+.lrow:nth-child(even):not(.lh){background:var(--hover)}
+.lrow.lh{position:sticky;top:0;background:var(--content);color:var(--muted);font-size:11.5px;border-bottom:.5px solid var(--line);padding:6px 14px}
+.lrow.lh span{cursor:default}.lrow.lh span:hover{color:var(--text)}
+.lrow.sel{background:var(--accent)!important;color:#04110d}
+.lrow .n{display:flex;gap:8px;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.lrow .m{color:var(--muted)}.lrow.sel .m{color:#04110d}
+.fstatus{padding:5px 14px;font-size:11.5px;color:var(--muted);border-top:.5px solid var(--line);text-align:center}
+.dropzone{position:absolute;inset:8px;border:2px dashed var(--accent);border-radius:10px;background:rgba(var(--accent-rgb),.08);display:none;place-items:center;font-weight:600;color:var(--accent);z-index:4;pointer-events:none}
+.dragging .dropzone{display:grid}
+
+/* ===== post reader ===== */
+.reader{display:flex;height:100%}
+.reader nav{width:200px;flex:none;padding:18px 10px;border-right:.5px solid var(--line);overflow:auto;background:var(--side)}
+.reader nav h5{font-size:11px;color:var(--muted);margin:0 8px 8px;font-weight:600}
+.reader nav a{display:block;padding:4px 8px;border-radius:5px;font-size:12.5px;color:var(--muted);text-decoration:none;cursor:default}
+.reader nav a:hover{background:var(--hover);color:var(--text)}
+.reader nav a.on{color:var(--accent);font-weight:600}
+.reader .scroll{flex:1;overflow:auto;position:relative}
+.progress{position:absolute;top:0;left:0;height:2px;background:var(--accent);z-index:2;transition:width .1s}
+.post{max-width:720px;margin:0 auto;padding:34px 40px 70px;user-select:text;-webkit-user-select:text;line-height:1.85;font-size:15px}
+.post .meta{font:12px var(--mono);color:var(--accent);margin-bottom:8px}
+.post h1{font-size:28px;line-height:1.3;letter-spacing:-.01em}
+.post .tags{margin:12px 0 26px;display:flex;gap:6px;flex-wrap:wrap}
+.post .tags span{font-size:11.5px;padding:2px 9px;border-radius:99px;background:rgba(var(--accent-rgb),.14);color:var(--accent)}
+.post h2{font-size:19px;margin:32px 0 8px;scroll-margin-top:20px}
+.post p,.post ul{margin:10px 0;opacity:.92}
+.post ul{padding-left:22px}
+.post code{font:13px var(--mono);background:var(--hover);padding:1px 6px;border-radius:5px}
+.post pre{background:var(--code);border:.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow:auto;margin:14px 0;position:relative}
+.post pre code{background:none;padding:0;color:var(--accent);font-size:12.5px;line-height:1.7}
+.post pre .cpy{position:absolute;top:8px;right:8px;font-size:11px;padding:2px 8px;border-radius:5px;background:var(--hover);color:var(--muted);opacity:0;transition:opacity .15s}
+.post pre:hover .cpy{opacity:1}
+.post blockquote{border-left:3px solid #febc2e;background:rgba(254,188,46,.1);padding:10px 14px;margin:16px 0;border-radius:0 8px 8px 0;font-size:14px}
+.rstatus{display:flex;justify-content:space-between;padding:5px 14px;font-size:11.5px;color:var(--muted);border-top:.5px solid var(--line);background:var(--win)}
+
+/* ===== terminal ===== */
+.term{height:100%;padding:8px 12px;font:12.5px/1.55 var(--mono);background:rgba(12,14,18,.94);color:#d4d4d8;overflow:auto;cursor:text;user-select:text;-webkit-user-select:text}
+[data-theme=light] .term{background:rgba(255,255,255,.96);color:#1d1d1f}
+.term .ln{white-space:pre-wrap;word-break:break-all}
+.term .p{color:var(--accent)}.term .e{color:#ff6b6b}.term .h{color:#60a5fa}.term .y{color:#eab308}
+.term input{background:none;border:0;outline:none;color:inherit;font:inherit;width:60%;caret-color:var(--accent)}
+
+/* ===== misc apps ===== */
+.pad{padding:24px 28px;line-height:1.8;user-select:text;-webkit-user-select:text;font-size:14px}
+.pad h2{font-size:22px}
+.pad .sub{color:var(--accent);font:12px var(--mono);margin:2px 0 16px}
+.pad ul{padding-left:20px}
+.pad a{color:var(--accent)}
+.tool{padding:16px;display:flex;flex-direction:column;gap:10px;height:100%}
+.tool textarea{flex:1;min-height:70px;background:var(--code);border:.5px solid var(--line);border-radius:8px;color:var(--text);font:12.5px var(--mono);padding:10px;resize:none;outline:none}
+.tool textarea:focus{box-shadow:0 0 0 3px rgba(var(--accent-rgb),.35)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn{padding:4px 12px;border-radius:6px;background:var(--hover);border:.5px solid var(--line);font-size:12.5px}
+.btn:hover{filter:brightness(1.25)}
+.btn.pri{background:var(--accent);color:#04110d;border-color:transparent;font-weight:600}
+.prefs{display:flex;height:100%}
+.prefs aside{width:170px;background:var(--side);padding:12px 8px;border-right:.5px solid var(--line)}
+.prefs aside button{display:flex;gap:8px;align-items:center;width:100%;padding:5px 8px;border-radius:6px;text-align:left}
+.prefs aside button.on{background:var(--accent);color:#04110d}
+.prefs .pane{flex:1;padding:22px;overflow:auto}
+.prefs h3{font-size:13px;margin-bottom:10px}
+.card{background:var(--hover);border-radius:10px;padding:14px;margin-bottom:16px}
+.swatches{display:flex;gap:10px}
+.sw{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.sw.on{box-shadow:0 0 0 2px var(--win-solid),0 0 0 4px currentColor}
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px}
+.choice{text-align:center;font-size:12px}
+.choice .pv{height:62px;border-radius:8px;margin-bottom:5px;border:3px solid transparent;overflow:hidden}
+.choice.on .pv{border-color:var(--accent)}
+.src{font:12px/1.6 var(--mono);padding:10px 0;user-select:text;-webkit-user-select:text;counter-reset:l}
+.src div{white-space:pre-wrap;word-break:break-all;padding-left:56px;position:relative}
+.src div::before{counter-increment:l;content:counter(l);position:absolute;left:0;width:44px;text-align:right;color:var(--muted);opacity:.6}
+
+/* ===== spotlight ===== */
+#spot{position:fixed;left:50%;top:22%;transform:translateX(-50%);width:min(640px,92vw);background:var(--menu);border:.5px solid var(--line);border-radius:14px;box-shadow:0 30px 90px rgba(0,0,0,.5);z-index:9700;display:none;overflow:hidden}
+#spot.open{display:block;animation:open .15s ease-out}
+#spot .in{display:flex;align-items:center;gap:12px;padding:12px 16px}
+#spot input{flex:1;background:none;border:0;outline:none;color:var(--text);font:22px var(--font)}
+#spot .res{max-height:360px;overflow:auto;border-top:.5px solid var(--line);padding:6px}
+#spot .res:empty{display:none}
+#spot .res h6{font-size:11px;color:var(--muted);margin:6px 10px 2px;font-weight:600}
+#spot .r{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:7px}
+#spot .r.on{background:var(--accent);color:#04110d}
+#spot .r .ri{width:26px;height:26px;flex:none}
+#spot .r small{display:block;opacity:.65;font-size:11px}
+
+/* ===== notifications / widgets ===== */
+#notes{position:fixed;top:calc(var(--menubar) + 10px);right:10px;display:flex;flex-direction:column;gap:8px;z-index:9800;width:340px;max-width:calc(100vw - 20px)}
+.note{display:flex;gap:10px;padding:11px 13px;border-radius:14px;background:var(--menu);border:.5px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.3);animation:slide .3s cubic-bezier(.2,.8,.2,1);font-size:12.5px}
+.note b{display:block;font-size:13px}
+.note .ni{width:32px;height:32px;flex:none}
+@keyframes slide{from{transform:translateX(110%)}}
+.note.out{transition:.25s;transform:translateX(110%);opacity:0}
+#cc{right:8px;width:320px;padding:12px}
+#cc .tile{background:var(--hover);border-radius:12px;padding:12px;margin-bottom:10px}
+#cc .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#cc .tg{display:flex;align-items:center;gap:10px;padding:4px 0}
+#cc .tg .c{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--hover)}
+#cc .tg.on .c{background:var(--accent);color:#04110d}
+#cc input[type=range]{width:100%;accent-color:var(--accent)}
+#calpop{right:8px;width:290px;padding:14px}
+#calpop table{width:100%;text-align:center;border-collapse:collapse;font-size:12px}
+#calpop th{color:var(--muted);font-weight:500;padding:3px 0}
+#calpop td{padding:5px 0}#calpop td.o{opacity:.3}
+#calpop td.t span{background:#ff5f57;color:#fff;border-radius:50%;display:inline-block;width:22px;height:22px;line-height:22px;font-weight:700}
+#boot{position:fixed;inset:0;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;transition:opacity .5s}
+#boot .bar{width:200px;height:5px;border-radius:3px;background:#333;overflow:hidden}
+#boot .bar i{display:block;height:100%;width:0;background:#e5e5e5;animation:load 1s ease-in-out forwards}
+@keyframes load{to{width:100%}}
+#lock{position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;align-items:center;padding-top:9vh;color:#fff;backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);background:rgba(0,0,0,.25)}
+#lock.open{display:flex}
+#lock .d{font-size:20px;font-weight:600;opacity:.85}
+#lock .t{font-size:96px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+#lock .u{margin-top:auto;margin-bottom:12vh;text-align:center}
+#lock .av{width:64px;height:64px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(135deg,var(--accent),#2563eb);display:grid;place-items:center;font-size:24px;font-weight:700}
+#lock .pw{margin-top:10px;padding:6px 14px;border-radius:99px;background:rgba(255,255,255,.2);font-size:12px}
+@media (max-width:700px){
+  #menubar .hide-m{display:none}
+  .finder aside,.reader nav{display:none}
+  .dk{width:42px!important;height:42px!important}
+  #dock{height:54px}
+  .post{padding:24px 20px 60px}
+}
+
+/* ===== v3 overrides: transform-based windows, perf, a11y ===== */
+.win{left:0;top:0;transition:none;contain:layout paint}
+.win.anim{transition:transform .34s cubic-bezier(.3,.7,.2,1),opacity .3s}
+.win.opening{animation:wopen .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes wopen{from{scale:.86;opacity:0;translate:0 34px}}
+.win.max{transform:none!important;top:0!important;left:0!important}
+.win.dragging{will-change:transform}
+.win.dragging .wbody{pointer-events:none}
+.dk{transition:none;transform-origin:50% 100%;will-change:transform}
+.dk .ico{transition:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tl b{cursor:default}
+/* hero (variable-weight hover text) */
+#hero{position:absolute;left:7vw;top:30%;pointer-events:none;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.35);z-index:0}
+#hero .sub,#hero .ttl{pointer-events:auto;display:inline-block}
+#hero .sub{font-size:clamp(16px,2.2vw,26px);font-family:"Noto Sans KR",var(--font)}
+#hero .ttl{font-size:clamp(56px,9vw,132px);letter-spacing:-.02em;line-height:1.05;margin-top:10px;font-family:"Noto Sans KR",var(--font)}
+#hero span{transition:font-weight .25s ease-out;display:inline-block}
+#hero .hint{margin-top:16px;font-size:13px;opacity:.75;font-weight:400}
+#hero .hint kbd{font:12px var(--mono);padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.18)}
+[data-theme=light] #hero{color:#111827;text-shadow:none}
+.smallnote{display:none;position:absolute;left:16px;right:16px;bottom:90px;padding:10px 14px;border-radius:12px;background:var(--menu);font-size:12.5px;z-index:1}
+@media (max-width:700px){#hero{top:16%;left:20px}.smallnote{display:block}}
+/* finder path bar */
+.pathbar{display:flex;align-items:center;gap:4px;padding:4px 12px;font-size:11.5px;color:var(--muted);border-top:.5px solid var(--line);white-space:nowrap;overflow:hidden}
+.pathbar button{padding:1px 4px;border-radius:4px;display:flex;align-items:center;gap:4px}
+.pathbar button:hover{background:var(--hover);color:var(--text)}
+.fi:focus{outline:none}
+/* browser (blog) */
+.brow{display:flex;flex-direction:column;height:100%}
+.addr{flex:1;max-width:420px;margin:0 auto;height:26px;border-radius:7px;background:var(--hover);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;color:var(--muted);padding:0 10px;overflow:hidden;white-space:nowrap}
+.addr b{color:var(--text);font-weight:500}
+.tbar.wide{gap:8px}
+.tbar.wide .wtitle{display:none}
+.home{max-width:880px;margin:0 auto;padding:34px 36px 60px}
+.home h1{font-size:30px;letter-spacing:-.01em}
+.home .lead{color:var(--muted);margin:4px 0 22px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{padding:3px 11px;border-radius:99px;font-size:12px;background:var(--hover)}
+.chip.on{background:var(--accent);color:#04110d;font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.pcard{text-align:left;padding:16px;border-radius:14px;background:var(--hover);border:.5px solid var(--line);display:flex;flex-direction:column;gap:6px;transition:transform .15s,box-shadow .15s}
+.pcard:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pcard .c{font:11px var(--mono)}
+.pcard b{font-size:15px;line-height:1.4}
+.pcard p{font-size:12.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.proj .kv{display:grid;grid-template-columns:90px 1fr;gap:6px 12px;font-size:13px;margin:14px 0}
+.proj .kv span:nth-child(odd){color:var(--muted)}
+.stack{display:flex;gap:6px;flex-wrap:wrap}
+.stack span{font:11.5px var(--mono);padding:2px 8px;border-radius:6px;background:var(--hover)}
+.bootlog{font:12px/1.7 var(--mono);color:#9ca3af;height:120px;width:320px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.bootlog .ok{color:#22d3a6}
+@media (max-width:700px){.win.max{height:calc(100% - 64px)!important}.addr{justify-content:flex-start}.tbar.wide .tbtn.fw{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-theme="dark">
+<noscript><h1>TS2k</h1><p>이 페이지는 JavaScript가 필요해요. 글은 <a href="https://ts2k.tistory.com/">티스토리 블로그</a>에서 읽을 수 있어요.</p></noscript>
+<div id="boot" role="status" aria-label="부팅 중"><svg width="64" height="64" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="7" fill="#e5e5e5"/><path d="M7 8.5h10M12 8.5v9" stroke="#000" stroke-width="2.6" stroke-linecap="round"/></svg><div class="bootlog"></div><div class="bar"><i></i></div><div style="font-size:11px;color:#555">클릭하거나 아무 키나 누르면 건너뜁니다</div></div>
+<canvas id="wall" aria-hidden="true"></canvas>
+
+<header id="menubar" class="blur">
+  <button class="mi" data-menu="sys" aria-label="시스템 메뉴"><svg width="15" height="15" viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="7" fill="currentColor"/><path d="M7 8.5h10M12 8.5v9" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+  <button class="mi app" data-menu="app" id="mbApp">탐색기</button>
+  <button class="mi hide-m" data-menu="file">파일</button>
+  <button class="mi hide-m" data-menu="view">보기</button>
+  <button class="mi hide-m" data-menu="go">이동</button>
+  <button class="mi hide-m" data-menu="window">윈도우</button>
+  <button class="mi hide-m" data-menu="help">도움말</button>
+  <div class="sp"></div>
+  <span class="mi hide-m" id="mbBat" title="배터리"><span id="batPct" style="font-size:12px;margin-right:5px"></span><svg width="24" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect id="batFill" x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><path d="M24 4v4" stroke="currentColor" opacity=".5" stroke-width="1.5"/></svg></span>
+  <span class="mi hide-m" title="Wi-Fi"><svg width="16" height="13" viewBox="0 0 24 18" fill="currentColor"><path d="M12 18l3.5-4.2a5.5 5.5 0 00-7 0zM12 9.5a10 10 0 016.4 2.3l2-2.4a13 13 0 00-16.8 0l2 2.4A10 10 0 0112 9.5zM12 3.5c3.9 0 7.4 1.4 10.2 3.7l2-2.4A16.6 16.6 0 0012 0C7.4 0 3.2 1.7-.1 4.8l2 2.4A13.6 13.6 0 0112 3.5z"/></svg></span>
+  <button class="mi" id="mbSpot" aria-label="빠른 검색"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg></button>
+  <button class="mi" id="mbCC" aria-label="제어 센터"><svg width="16" height="14" viewBox="0 0 24 20" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="2" width="22" height="6" rx="3"/><circle cx="17" cy="5" r="1.6" fill="currentColor"/><rect x="1" y="12" width="22" height="6" rx="3"/><circle cx="7" cy="15" r="1.6" fill="currentColor"/></svg></button>
+  <button class="mi" id="mbClock" aria-label="달력"></button>
+</header>
+<div id="drop" class="drop blur" role="menu"></div>
+<div id="cc" class="drop blur"></div>
+<div id="calpop" class="drop blur"></div>
+
+<main id="desktop">
+  <div id="hero"><div class="sub" data-w="100,500,200">안녕하세요, 이것저것 만들고 기록하는 김태섭입니다</div><br><div class="ttl" data-w="300,900,500">TS2k</div>
+    <div class="hint">개발 · 공부 · 일상 &nbsp;|&nbsp; <kbd>⌘K</kbd> 검색 · 아이콘을 더블클릭해 둘러보세요</div></div>
+  <div class="smallnote">맥 데스크톱처럼 꾸민 블로그예요. 큰 화면에서 보면 창을 자유롭게 옮길 수 있어요.</div>
+  <div id="selbox"></div>
+</main>
+<nav id="dock" class="blur" aria-label="Dock"></nav>
+<div id="spot" class="blur" role="dialog" aria-label="빠른 검색"><div class="in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="opacity:.6"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg><input placeholder="빠른 검색 — 글, 프로젝트, 앱, 명령" spellcheck="false" aria-label="검색어"></div><div class="res"></div></div>
+<div id="notes" aria-live="polite"></div>
+<div id="lock"><div class="d"></div><div class="t"></div><div class="u"><div class="av">T</div><b>tsk</b><div class="pw">클릭하거나 아무 키나 눌러 잠금 해제</div></div></div>
+<input type="file" id="filePick" accept=".md,.txt,.markdown" multiple hidden>
+
+<script>
+"use strict";
+/* =========================================================
+   1. CONTENT — 데이터만 고치면 Finder·터미널·Spotlight가 모두 갱신됨
+   ========================================================= */
+let POSTS=[
+ {slug:"ssh-bruteforce",title:"SSH 무차별 대입 공격, 로그로 잡고 fail2ban으로 막기",date:"2026-11-18",cat:"Blue Team",tags:["Linux","SSH","탐지"],read:6,body:`
+서버를 퍼블릭 IP로 열어두면 몇 분 안에 <code>sshd</code> 로그가 실패 기록으로 가득 찹니다. 대부분은 자동화된 봇이지만, 패턴을 읽을 줄 알면 방어 규칙을 훨씬 정확하게 만들 수 있습니다.
+## 1. 로그에서 공격 흔적 찾기
+<pre><code>sudo grep "Failed password" /var/log/auth.log \\
+  | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn | head</code></pre>
+IP별 실패 횟수를 세면 상위 몇 개 대역이 전체 시도의 대부분을 차지하는 경우가 많습니다.
+## 2. fail2ban 기본 설정
+<pre><code>[sshd]
+enabled  = true
+maxretry = 5
+findtime = 10m
+bantime  = 1h</code></pre>
+> bantime을 무작정 늘리기보다 <code>bantime.increment = true</code>로 재범 IP에만 점점 길게 거는 편이 운영상 안전합니다.
+## 3. 근본 대책
+- 비밀번호 로그인 끄기: <code>PasswordAuthentication no</code>
+- root 직접 로그인 금지: <code>PermitRootLogin no</code>
+- 키 기반 인증 + 필요하면 접속 IP 제한
+fail2ban은 소음을 줄여주는 도구일 뿐, 인증 방식 자체를 강하게 만드는 게 먼저입니다.`},
+ {slug:"honeypot-intro",title:"허니팟으로 공격자 행동 관찰하기 — Cowrie 입문",date:"2026-11-10",cat:"Research",tags:["Honeypot","Cowrie","위협 인텔"],read:8,body:`
+허니팟은 일부러 '공격받기 위해' 띄워두는 미끼 시스템입니다. 실제 서비스와 분리해 두고, 들어오는 공격자의 명령·다운로드 파일·접속 경로를 기록합니다.
+## 왜 쓰나
+- 실제 환경에 오기 전에 공격 트렌드를 먼저 파악
+- 수집한 IP·해시로 차단 목록과 탐지 룰을 보강
+- 로그 데이터를 대시보드로 시각화해 학습 자료로 활용
+## Cowrie 빠르게 띄우기
+<pre><code>docker run -d -p 2222:2222 cowrie/cowrie
+# 22번 포트를 2222로 포워딩 (실서비스 sshd는 다른 포트로 이동)
+sudo iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222</code></pre>
+## 관찰 포인트
+접속 직후 공격자들이 거의 공통으로 치는 명령이 있습니다: <code>uname -a</code>, <code>cat /proc/cpuinfo</code>, 그리고 마이너 다운로드 시도. 이 순서 자체가 봇의 지문이 됩니다.
+> 허니팟은 반드시 격리된 네트워크에 두세요. 탈취당한 허니팟이 다른 곳을 공격하는 발판이 되면 안 됩니다.`},
+ {slug:"xss-basics",title:"XSS 다시 보기: 반사형, 저장형, DOM 기반의 차이",date:"2026-10-29",cat:"Web",tags:["XSS","OWASP","프론트엔드"],read:7,body:`
+XSS는 '사용자 입력이 코드로 해석되는' 문제입니다. 종류마다 입력이 어디로 들어가서 어디서 실행되는지가 다릅니다.
+## 세 가지 유형
+- <b>반사형</b>: 요청 파라미터가 응답에 그대로 반사됨. 피해자가 조작된 링크를 클릭해야 함
+- <b>저장형</b>: 게시글·댓글처럼 서버에 저장된 입력이 다른 사용자에게 노출됨. 파급력이 가장 큼
+- <b>DOM 기반</b>: 서버를 거치지 않고 클라이언트 JS가 <code>location.hash</code> 등을 위험한 싱크에 넣음
+## 위험한 싱크 예시
+<pre><code>el.innerHTML = location.hash.slice(1);   // ❌
+el.textContent = location.hash.slice(1); // ✅</code></pre>
+## 방어 체크리스트
+- 출력 위치(HTML/속성/JS/URL)에 맞는 인코딩
+- 프레임워크 기본 이스케이프를 우회하는 API(<code>dangerouslySetInnerHTML</code>, <code>v-html</code>) 사용 최소화
+- CSP로 인라인 스크립트 실행 제한
+- 세션 쿠키에 <code>HttpOnly</code>
+> 이 글의 코드는 학습용입니다. 허가받지 않은 시스템에 테스트하지 마세요.`},
+ {slug:"jwt-pitfalls",title:"JWT를 쓸 때 자주 하는 실수 5가지",date:"2026-10-15",cat:"Web",tags:["JWT","인증","API"],read:5,body:`
+JWT는 편하지만, '서명된 JSON'이라는 본질을 잊으면 쉽게 구멍이 생깁니다.
+## 1. alg 헤더를 믿는다
+서버는 허용 알고리즘을 고정해야 합니다. 헤더의 <code>alg</code>를 그대로 따르면 <code>none</code> 또는 알고리즘 혼동 공격에 노출됩니다.
+<pre><code>jwt.verify(token, key, { algorithms: ["RS256"] });</code></pre>
+## 2. 페이로드에 민감 정보를 넣는다
+JWT는 암호화가 아니라 Base64URL 인코딩입니다. 누구나 디코딩할 수 있습니다.
+## 3. 만료가 너무 길다
+액세스 토큰은 짧게, 리프레시 토큰은 회전(rotation)과 폐기 목록으로 관리하세요.
+## 4. 약한 HMAC 시크릿
+짧은 시크릿은 오프라인 크래킹 대상이 됩니다. 충분히 긴 랜덤 값을 쓰세요.
+## 5. 로그아웃을 구현하지 않는다
+상태가 없는 토큰이라도 서버 측 무효화 수단(블랙리스트, 토큰 버전)은 필요합니다.`},
+ {slug:"ctf-web-routine",title:"CTF 웹 문제를 만났을 때 내 첫 10분 루틴",date:"2026-09-30",cat:"CTF",tags:["CTF","Recon","Writeup"],read:4,body:`
+웹 문제는 처음 10분의 정찰이 풀이 시간을 크게 좌우합니다. 제가 매번 같은 순서로 확인하는 것들입니다.
+## 체크 순서
+- 페이지 소스와 주석, 로드되는 JS 파일 훑기
+- <code>/robots.txt</code>, <code>/.git/</code>, 백업 파일(<code>.bak</code>, <code>~</code>) 확인
+- 쿠키·세션 값 디코딩 (Base64, JWT 여부)
+- 입력 지점마다 따옴표, <code>{{7*7}}</code>, <code>../</code> 같은 기본 페이로드로 반응 보기
+- 응답 헤더로 서버/프레임워크 버전 파악
+## 도구
+<pre><code>curl -i http://chall.local/
+ffuf -u http://chall.local/FUZZ -w common.txt</code></pre>
+> 정찰 결과는 바로 메모하세요. 막혔을 때 되돌아볼 근거가 됩니다.`}
+];
+
+let WRITEUPS=[{name:"2026-학내CTF-web01.md",slug:"ctf-web-routine"}];
+
+const PROJECTS=[
+ {id:"honeyguard",name:"HoneyGuard",sub:"멀티 클라우드 AI 기반 관제 및 자동 차단 대시보드 (졸업 프로젝트)",
+  desc:"허니팟으로 수집한 공격 정보를 실제 방어에 쓰고, 무료 티어 서버 같은 작은 환경에서도 돌아가는 보안 도구를 목표로 만든 프로젝트입니다.",
+  points:["Oracle 서버를 허니팟(미끼)으로, AWS 서버를 수신·웹 서비스로 분리한 멀티 클라우드 구조","직접 라벨링한 허니팟 명령 데이터셋으로 학습한 INT8 NLP 모델이 악성 여부를 판정","판정 결과에 따라 자동 차단하고 Slack으로 알림","관리자 대시보드에서 공격 현황 확인"],
+  stack:["Python","NLP (INT8)","AWS","Oracle Cloud","Slack API"],status:"성능 평가 실험 진행 중",link:"https://github.com/TSK2"},
+ {id:"pokekkang",name:"PokeKkang",sub:"3D 틸트 홀로그램 카드 뽑기 iOS 앱 (포켓깡)",post:"HoloCards",
+  desc:"폰을 기울이면 카드가 3D로 기울어지고 홀로그램 광택이 빛을 따라 움직이는 카드 뽑기·수집 앱입니다.",
+  points:["자이로·드래그로 3D 틸트, 가만히 있으면 정면으로 복귀","Metal 셰이더로 광택·무지개 포일·반짝이 홀로 효과 3종","10장짜리 카드 팩 뽑기, 4시간마다 충전되는 팩 에너지","뽑은 카드를 레어도별로 모으는 바인더"],
+  stack:["Swift","SwiftUI","SwiftData","CoreMotion","Metal"],status:"개발 중 · GitHub 공개 예정"},
+ {id:"rambar",name:"RAMBar",sub:"macOS 메뉴바 RAM 모니터",post:"RAMBar",
+  desc:"메뉴바에 메모리 압력 점과 사용률(%)만 띄우는 아주 가벼운 맥 앱입니다. 클릭하면 상세 정보와 메모리를 많이 쓰는 앱 목록을 보고 바로 정리할 수 있습니다.",
+  points:["메모리 압력 색(초록·노랑·빨강) + 사용률 실시간 표시","앱 메모리·와이어드·압축·캐시·스왑 상세 보기","하위 프로세스까지 합산한 앱별 메모리, 클릭해서 종료","창 없는 앱 한 번에 정리, 로그인 시 자동 실행"],
+  stack:["Swift","AppKit","ServiceManagement"],status:"GitHub 공개 예정"}
+];
+/* 프로젝트 카드와 연결된 개발 일지 글 찾기 (제목에 post 키워드가 들어간 최신 글) */
+const projectPost=p=>p.post?POSTS.find(x=>x.title.includes(p.post)):null;
+const SKILLS={"개발":["Python","JavaScript","Swift (iOS/macOS 앱)","크롬·사파리 확장"],"보안":["로그 분석","허니팟 운영","웹 취약점"],"클라우드":["AWS","Oracle Cloud"]};
+const CATS={"개발":"#0a84ff","Dev":"#0a84ff","보안":"#30d158","Security":"#30d158","Blue Team":"#30d158","Web":"#64d2ff","CTF":"#ff9f0a","Research":"#bf5af2","일상":"#ff9f0a","잡담":"#ff375f","생각":"#bf5af2","리뷰":"#ffd60a","가져온 글":"#98989d"};
+const PALETTE=["#38bdf8","#a78bfa","#f472b6","#f5a524","#34d399","#fb7185","#60a5fa","#facc15"];
+function catColor(c){if(CATS[c])return CATS[c];let h=0;for(const ch of String(c))h=(h*31+ch.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length]}
+/* 블로그 기본 정보 — 티스토리에서는 스킨이 자동으로 채움 */
+const TT=document.getElementById("tt-data");
+const BLOG={title:"TS2k",desc:"개발하고, 공부하고, 가끔은 수다 떠는 블로그",link:location.origin+"/",host:"ts2k.blog"};
+let CURRENT=null,INITIAL={};
+const postHTML=p=>p.html??md(p.body||"");
+const latest=()=>POSTS[0]||null;
+
+/* 파일 시스템 트리: 매번 POSTS에서 생성 → 글을 추가하면 모든 곳에 자동 반영 */
+const dir=(id,name,children)=>({type:"dir",id,name,children});
+function buildFS(){return dir("~","tsk",[
+ dir("posts","블로그 글",POSTS.map(p=>({type:"post",name:p.title+".md",file:p.file||p.slug+".md",slug:p.slug,date:p.date,kind:p.cat}))),
+ ...(WRITEUPS.length?[dir("ctf","CTF 라이트업",WRITEUPS.map(w=>({type:"post",name:w.name,file:w.name,slug:w.slug,date:"2026-09-30",kind:"CTF"})))]:[]),
+ dir("projects","프로젝트",[...PROJECTS.map(p=>({type:"project",name:p.name,file:p.id,id:p.id,date:"2026",kind:"프로젝트"})),...POSTS.filter(p=>isProjectPost(p)&&!PROJECTS.some(q=>q.post&&p.title.includes(q.post))).map(p=>({type:"post",name:p.title+".md",file:p.file||p.slug+".md",slug:p.slug,date:p.date,kind:"프로젝트 글"}))]),
+ dir("apps","응용 프로그램",Object.entries(APPS).filter(([,A])=>!A.hidden).map(([id,A])=>({type:"app",name:A.name,file:id,app:id,date:"—",kind:"응용 프로그램",icon:A.icon}))),
+ {type:"file",name:"about_me.txt",file:"about_me.txt",app:"about",date:"2026-11-22",kind:"텍스트"}])}
+let FS;
+/* 카테고리 이름에 "프로젝트"가 들어간 글은 프로젝트 폴더에도 보임 */
+const isProjectPost=p=>/프로젝트|project/i.test(p.cat||"");
+function resolve(path){let n=FS;for(const id of path){n=(n.children||[]).find(c=>c.id===id);if(!n)return null}return n}
+function flatten(n=FS,path=[],out=[]){(n.children||[]).forEach(c=>{out.push({...c,path});if(c.type==="dir")flatten(c,[...path,c.id],out)});return out}
+
+/* =========================================================
+   2. ICONS
+   ========================================================= */
+const ICON_SVG={
+ finder:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gF" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#5ac8fa"/><stop offset="1" stop-color="#0a64d6"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gF)"/><path d="M32 0v64" stroke="#e8f3ff" stroke-width="0"/><path d="M0 14a14 14 0 0114-14h20c-5 10-7 21-6 32h7c-1 12 1 22 5 32H14A14 14 0 010 50z" fill="#e8f3ff"/><path d="M19 20v7M45 20v7" stroke="#123" stroke-width="3.5" stroke-linecap="round"/><path d="M17 42c9 7 21 7 30 0" stroke="#123" stroke-width="3.2" fill="none" stroke-linecap="round"/></svg>`,
+ blog:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gB" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gB)"/><circle cx="32" cy="32" r="21" fill="#fff"/><circle cx="32" cy="32" r="21" fill="none" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="1.5 4.2"/><path d="M41 23l-6 12-12 6 6-12z" fill="#ef4444"/><path d="M29 29l12-6-6 12z" fill="#e5e7eb"/></svg>`,
+ terminal:`<svg viewBox="0 0 64 64" class="ai"><rect width="64" height="64" rx="14" fill="#2a2d34"/><rect x="5" y="5" width="54" height="54" rx="10" fill="#0d0f13"/><path d="M15 24l9 7-9 7" stroke="#e5e7eb" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M29 40h14" stroke="#e5e7eb" stroke-width="4" stroke-linecap="round"/></svg>`,
+ crypto:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gC" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffb340"/><stop offset="1" stop-color="#ff6a00"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gC)"/><path d="M22 22l-9 10 9 10M42 22l9 10-9 10M35 18l-6 28" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ about:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="1" stop-color="#475569"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gA)"/><circle cx="32" cy="25" r="9" fill="#fff"/><path d="M15 50c3-9 9-13 17-13s14 4 17 13" fill="#fff"/></svg>`,
+ contact:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gM" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4ade80"/><stop offset="1" stop-color="#15803d"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gM)"/><path d="M32 14c-11 0-20 7.4-20 16.5 0 5.3 3 10 7.8 13l-2 7.5 8.3-4.6c1.9.4 3.9.6 5.9.6 11 0 20-7.4 20-16.5S43 14 32 14z" fill="#fff"/></svg>`,
+ settings:`<svg viewBox="0 0 64 64" class="ai"><defs><linearGradient id="gS" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9ca3af"/><stop offset="1" stop-color="#4b5563"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#gS)"/><g transform="translate(32 32)"><g fill="#e5e7eb">${Array.from({length:8},(_,i)=>`<rect x="-3.5" y="-21" width="7" height="10" rx="2" transform="rotate(${i*45})"/>`).join("")}</g><circle r="14" fill="#e5e7eb"/><circle r="6" fill="#4b5563"/></g></svg>`,
+ source:`<svg viewBox="0 0 64 64" class="ai"><rect width="64" height="64" rx="14" fill="#f8fafc"/><path d="M24 22l-10 10 10 10M40 22l10 10-10 10" stroke="#0ea5e9" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ trash:`<svg viewBox="0 0 64 64" class="ai"><path d="M14 16h36l-3.5 42a3 3 0 01-3 2.8H20.5a3 3 0 01-3-2.8z" fill="rgba(220,225,232,.55)" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/><ellipse cx="32" cy="16" rx="19" ry="3.5" fill="rgba(240,244,248,.85)"/><path d="M24 24l1.5 30M32 24v30M40 24l-1.5 30" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/></svg>`,
+ folder:`<svg viewBox="0 0 64 54" class="ai"><path d="M2 8a5 5 0 015-5h15l5 5h30a5 5 0 015 5v4H2z" fill="#3b9ae6"/><path d="M2 15h60v32a5 5 0 01-5 5H7a5 5 0 01-5-5z" fill="#63b6f7"/></svg>`,
+ doc:`<svg viewBox="0 0 48 60" class="ai"><path d="M4 2h28l12 12v42a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2z" fill="#fff" stroke="#cbd5e1"/><path d="M32 2v12h12" fill="#e2e8f0"/><path d="M10 26h28M10 33h28M10 40h18" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+ project:`<svg viewBox="0 0 64 64" class="ai"><rect x="6" y="10" width="52" height="44" rx="8" fill="#0f172a" stroke="#334155"/><rect x="6" y="10" width="52" height="10" rx="8" fill="#1e293b"/><circle cx="14" cy="15" r="2" fill="#ff5f57"/><circle cx="20" cy="15" r="2" fill="#febc2e"/><circle cx="26" cy="15" r="2" fill="#28c840"/><path d="M14 44l8-10 7 6 9-12 10 16" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linejoin="round"/></svg>`
+};
+
+/* =========================================================
+   3. UTILS
+   ========================================================= */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mobile=()=>innerWidth<700;
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const store={get(k,d=null){try{const v=localStorage.getItem("tsk3-"+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem("tsk3-"+k,JSON.stringify(v))}catch{}}};
+const debounce=(f,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>f(...a),ms)}};
+const PAGE_SRC=document.documentElement.outerHTML;
+function mini(i){return `<span style="width:16px;height:16px;display:inline-block;flex:none">${ICON_SVG[i]}</span>`}
+function thumbHTML(p){if(!p)return "";if(p.thumb)return `<div class="thumb" style="padding:0"><img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block"><span class="band" style="background:${catColor(p.cat)}"></span></div>`;return `<div class="thumb"><span class="band" style="background:${catColor(p.cat)}"></span><div class="tt">${esc(p.title)}</div><i></i><i style="width:80%"></i><i></i><i style="width:60%"></i><i></i><i style="width:75%"></i></div>`}
+function md(s){const out=[],pres=[];let list=null,hn=0;
+ s=s.trim().replace(/<pre>[\s\S]*?<\/pre>/g,m=>"<pre>\u0000"+(pres.push(m)-1));
+ s.split("\n").map(l=>l.replace(/^<pre>\u0000(\d+)$/,(_,i)=>pres[i])).forEach(l=>{if(l.startsWith("- ")){if(!list){list=[];out.push(list)}list.push(l.slice(2));return}list=null;
+  if(l.startsWith("## "))out.push(`<h2 id="h${hn++}">${l.slice(3)}</h2>`);else if(l.startsWith("> "))out.push(`<blockquote>${l.slice(2)}</blockquote>`);else if(l.startsWith("<pre>"))out.push(l.replace("<pre>",'<pre><button class="cpy">복사</button>'));else if(l.trim())out.push(`<p>${l}</p>`)});
+ return out.map(o=>Array.isArray(o)?`<ul>${o.map(i=>`<li>${i}</li>`).join("")}</ul>`:o).join("")}
+function plainMd(src){return esc(src).replace(/```[\w-]*\n([\s\S]*?)```/g,(_,c)=>`<pre><code>${c.replace(/\n$/,"")}</code></pre>`).replace(/`([^`\n]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/^#{2,}\s/gm,"## ").replace(/^&gt; /gm,"> ").replace(/^\* /gm,"- ")}
+const textOf=html=>{const d=document.createElement("div");d.innerHTML=html.replace(/<\/(p|h2|li|pre|blockquote)>/g,"$&\n");d.querySelectorAll(".cpy").forEach(b=>b.remove());return d.textContent};
+async function sha(s,alg="SHA-256"){const b=await crypto.subtle.digest(alg,new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+let DND=false;try{DND=JSON.parse(localStorage.getItem("tsk3-dnd")||"false")}catch{}
+function notify(title,msg,icon="finder"){if(DND)return;const n=document.createElement("div");n.className="note";n.innerHTML=`<div class="ni">${ICON_SVG[icon]||ICON_SVG.finder}</div><div><b>${title}</b>${msg}</div>`;$("#notes").prepend(n);
+ n.onclick=()=>n.remove();setTimeout(()=>{n.classList.add("out");setTimeout(()=>n.remove(),260)},4200)}
+function findPost(a){if(!a)return null;a=String(a).replace(/\.md$/,"");const b=a.replace(/^.*\//,"");const wu=WRITEUPS.find(w=>w.name.replace(/\.md$/,"")===b);return POSTS.find(p=>p.slug===a||p.slug===(wu?wu.slug:b)||(p.file||"").replace(/\.md$/,"")===b)||null}
+
+/* =========================================================
+   4. THEME / WALLPAPER (성능: DPR 상한, 30fps, 탭 숨김·전체화면 창일 때 정지)
+   ========================================================= */
+const WALLS={aurora:"오로라",sunset:"노을",stars:"별밤",net:"별자리 네트워크"};
+let wp=store.get("wall","aurora");if(!WALLS[wp])wp="aurora";
+function setAccent(c){const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);document.documentElement.style.setProperty("--accent",c);document.documentElement.style.setProperty("--accent-rgb",`${r},${g},${b}`);accRGB=`${r},${g},${b}`;store.set("accent",c);wake()}
+function setWall(w){wp=w;store.set("wall",w);wake()}
+function setTheme(t){document.body.dataset.theme=t;store.set("theme",t);wake()}
+const cv=$("#wall"),cx=cv.getContext("2d",{alpha:false});let W,H,DPR,pts=[],drops=[],last=0,accRGB="34,211,166",running=false;
+function resize(){DPR=Math.min(devicePixelRatio||1,1.5);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;
+ pts=Array.from({length:Math.min(90,Math.floor(innerWidth*innerHeight/16000))},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4*DPR,vy:(Math.random()-.5)*.4*DPR}));
+ drops=Array.from({length:Math.min(260,Math.floor(innerWidth*innerHeight/5000))},()=>({x:Math.random()*W,y:Math.random()*H*.85,r:(Math.random()*1.3+.3)*DPR,p:Math.random()*6.28,s:.5+Math.random()*1.5}));wake()}
+const covered=()=>[...WM.wins.values()].some(w=>!w.min&&w.el.classList.contains("max"));
+function shouldRun(){return !document.hidden&&!covered()&&!reduceMotion}
+function wake(){if(!running){running=true;requestAnimationFrame(frame)}}
+function frame(t){
+ const fps=30;
+ if(t-last>=1000/fps||!last){last=t;draw(t)}
+ if(shouldRun())requestAnimationFrame(frame);else{running=false;draw(t)}}
+function draw(t){const a=accRGB,d=DPR,lt=document.body.dataset.theme==="light";
+ if(wp==="aurora"){cx.fillStyle=lt?"#e9eef5":"#060a12";cx.fillRect(0,0,W,H);cx.globalCompositeOperation=lt?"multiply":"screen";
+  [[a,.30,.25,.55],["168,85,247",.75,.3,.5],["255,95,145",.55,.85,.45],["94,234,212",.15,.85,.4]].forEach(([c,bx,by,r],i)=>{const x=W*(bx+.08*Math.sin(t/6000+i*2)),y=H*(by+.08*Math.cos(t/7000+i)),R=Math.max(W,H)*r;
+   const g=cx.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,`rgba(${c},${lt?.35:.55})`);g.addColorStop(1,`rgba(${c},0)`);cx.fillStyle=g;cx.fillRect(0,0,W,H)});
+  cx.globalCompositeOperation="source-over";cx.strokeStyle=`rgba(255,255,255,${lt?.25:.05})`;cx.lineWidth=d;
+  for(let i=0;i<6;i++){cx.beginPath();for(let x=0;x<=W;x+=24*d){const y=H*(.55+i*.06)+Math.sin(x/(260*d)+t/3000+i)*40*d;x?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke()}}
+ else if(wp==="net"){cx.fillStyle="#04090c";cx.fillRect(0,0,W,H);for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1}
+  const L=140*d,L2=L*L;cx.lineWidth=d;for(let i=0;i<pts.length;i++){const p=pts[i];for(let j=i+1;j<pts.length;j++){const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,dd=dx*dx+dy*dy;if(dd<L2){cx.strokeStyle=`rgba(${a},${(1-Math.sqrt(dd)/L)*.35})`;cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke()}}}
+  cx.fillStyle=`rgba(${a},.9)`;cx.beginPath();for(const p of pts){cx.moveTo(p.x+1.8*d,p.y);cx.arc(p.x,p.y,1.8*d,0,7)}cx.fill()}
+ else if(wp==="stars"){const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,lt?"#25335a":"#030712");g.addColorStop(1,lt?"#7d6aa8":"#1b1f3b");cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  for(const s of drops){const k=.55+.45*Math.sin(t/1000*s.s+s.p);cx.fillStyle=`rgba(255,255,255,${k})`;cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()}
+  const mx=W*.82,my=H*.2,R=40*d;const mg=cx.createRadialGradient(mx,my,R*.4,mx,my,R*4);mg.addColorStop(0,"rgba(255,244,214,.35)");mg.addColorStop(1,"rgba(255,244,214,0)");cx.fillStyle=mg;cx.fillRect(0,0,W,H);cx.fillStyle="#fff4d6";cx.beginPath();cx.arc(mx,my,R,0,7);cx.fill()}
+ else{const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,lt?"#ffd6a5":"#2b1055");g.addColorStop(.55,lt?"#ff9a8b":"#d6455d");g.addColorStop(1,lt?"#ffcf71":"#ff9a3c");cx.fillStyle=g;cx.fillRect(0,0,W,H);
+  const sy=H*.62+Math.sin(t/5000)*6*d;const sg=cx.createRadialGradient(W*.5,sy,0,W*.5,sy,H*.5);sg.addColorStop(0,"rgba(255,236,179,.95)");sg.addColorStop(.12,"rgba(255,214,140,.6)");sg.addColorStop(1,"rgba(255,214,140,0)");cx.fillStyle=sg;cx.fillRect(0,0,W,H);
+  [["rgba(60,20,70,.55)",.70,22],["rgba(40,12,50,.7)",.78,30],["rgba(24,8,34,.85)",.87,40]].forEach(([c,b,a],i)=>{cx.fillStyle=c;cx.beginPath();cx.moveTo(0,H);for(let x=0;x<=W;x+=24*d)cx.lineTo(x,H*b+Math.sin(x/(320*d)+t/(4000+i*900)+i*2)*a*d);cx.lineTo(W,H);cx.fill()})}}
+
+addEventListener("resize",debounce(resize,150));document.addEventListener("visibilitychange",wake);
+
+/* =========================================================
+   5. WINDOW MANAGER — 중앙 상태 + transform 기반 드래그 (rAF)
+   ========================================================= */
+const desk=$("#desktop");
+const WM={wins:new Map(),z:10,active:null,seq:0};
+const persist=debounce(()=>store.set("session",[...WM.wins.values()].map(w=>({app:w.app,arg:w.arg,x:w.x,y:w.y,w:w.w,h:w.h,max:w.el.classList.contains("max"),min:w.min}))),400);
+function place(w){w.el.style.transform=`translate3d(${w.x}px,${w.y}px,0)`}
+function openApp(app,arg={},geo){
+ const A=APPS[app];if(!A)return;const key=A.single?app:app+":"+(arg.id||arg.slug||"");
+ for(const w of WM.wins.values())if(w.key===key){if(A.onReopen)A.onReopen(w,arg);w.min?restore(w.id):focus(w.id);return w.id}
+ const id=++WM.seq,el=document.createElement("section");el.className="win"+(reduceMotion?"":" opening");el.setAttribute("aria-label",A.name);
+ const vis=[...WM.wins.values()].filter(w=>!w.min).length;
+ const ww=Math.min(geo?.w||A.w,innerWidth-16),hh=Math.min(geo?.h||A.h,innerHeight-120);
+ const w={id,app,key,arg,el,min:false,title:A.name,w:ww,h:hh,
+  x:geo?.x??(vis===0&&innerWidth>1200?Math.max(8,innerWidth-ww-150):Math.max(8,(innerWidth-ww)/2-40+vis*26)),y:geo?.y??Math.max(8,(innerHeight-hh)/2-70+vis*26),
+  setTitle(t){this.title=t;el.querySelector(".wtitle").textContent=t;if(WM.active===id)syncMenu()}};
+ el.style.width=ww+"px";el.style.height=hh+"px";place(w);
+ el.innerHTML=`<div class="tbar"><div class="tl"><b class="r" data-a="close" role="button" aria-label="닫기">×</b><b class="y" data-a="min" role="button" aria-label="최소화">−</b><b class="g" data-a="zoom" role="button" aria-label="확대">+</b></div><div class="wtitle"></div><div class="tools"></div></div><div class="wbody"></div><div class="rz"></div>`;
+ desk.appendChild(el);el.addEventListener("animationend",()=>el.classList.remove("opening"),{once:true});
+ WM.wins.set(id,w);w.setTitle(A.name);
+ if(mobile()||geo?.max)el.classList.add("max");
+ el.addEventListener("pointerdown",()=>{if(WM.active!==id)focus(id)},true);
+ el.querySelector(".tbar").addEventListener("dblclick",e=>{if(!e.target.closest(".tl,.tools,input"))zoom(id)});
+ el.querySelector(".tl").addEventListener("click",e=>{const a=e.target.dataset.a;if(a){e.stopPropagation();({close:closeWin,min:minimize,zoom})[a](id)}});
+ dragWin(w);resizeWin(w);
+ A.render(el.querySelector(".wbody"),w,arg);
+ focus(id);syncDock();persist();wake();return id}
+function focus(id){const w=WM.wins.get(id);if(!w)return;WM.wins.forEach(x=>x.el.classList.toggle("focus",x===w));w.el.style.zIndex=++WM.z;WM.active=id;syncMenu();
+ const i=w.el.querySelector(".term input,.tool textarea");if(i&&!mobile())requestAnimationFrame(()=>i.focus())}
+function blurAll(){WM.active=null;WM.wins.forEach(x=>x.el.classList.remove("focus"));syncMenu()}
+function topWin(){return [...WM.wins.values()].filter(x=>!x.min).sort((a,b)=>b.el.style.zIndex-a.el.style.zIndex)[0]}
+function zoom(id){const w=WM.wins.get(id);w.el.classList.add("anim");w.el.classList.toggle("max");setTimeout(()=>w.el.classList.remove("anim"),350);persist();wake()}
+function dockPoint(app){const d=$(`.dk[data-app="${app}"]`)||$("#dock"),r=d.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
+function minimize(id){const w=WM.wins.get(id);if(!w||w.min)return;const p=dockPoint(w.app),r=w.el.getBoundingClientRect();
+ w.wasMax=w.el.classList.contains("max");w.el.classList.add("anim");
+ if(w.wasMax){w.el.classList.remove("max");w.el.style.transform=`translate3d(0,0,0)`;}
+ w.el.style.transform=`translate3d(${p.x-r.width/2}px,${p.y-r.height/2-26}px,0) scale(.05)`;w.el.style.opacity="0";w.min=true;
+ if(w.wasMax){w.el.style.width=r.width+"px";w.el.style.height=r.height+"px"}
+ setTimeout(()=>{if(w.min){w.el.classList.add("hidden");w.el.classList.remove("anim")}},340);
+ const n=topWin();n?focus(n.id):blurAll();persist();wake()}
+function restore(id){const w=WM.wins.get(id);if(!w)return;w.min=false;w.el.classList.remove("hidden");w.el.classList.add("anim");
+ if(w.wasMax){w.el.style.width=w.w+"px";w.el.style.height=w.h+"px"}
+ requestAnimationFrame(()=>{place(w);w.el.style.opacity="";setTimeout(()=>{w.el.classList.remove("anim");if(w.wasMax)w.el.classList.add("max")},340)});focus(id);persist()}
+function closeWin(id){const w=WM.wins.get(id);if(!w)return;w.el.classList.add("anim");w.el.style.opacity="0";w.el.style.transform+=" scale(.94)";setTimeout(()=>w.el.remove(),300);WM.wins.delete(id);
+ if(w.app==="blog"&&location.hash)history.replaceState(null,"",location.pathname+location.search);
+ syncDock();const n=topWin();n?focus(n.id):blurAll();persist();wake()}
+/* 드래그: React setState 대신 rAF 한 번에 transform만 갱신 → 레이아웃 재계산 없음 */
+function dragWin(w){const el=w.el,tb=el.querySelector(".tbar");
+ tb.addEventListener("pointerdown",e=>{if(e.target.closest(".tl,.tools,input")||e.button||mobile())return;
+  tb.setPointerCapture(e.pointerId);let sx=e.clientX,sy=e.clientY,ox=w.x,oy=w.y,raf=0,nx=ox,ny=oy;el.classList.add("dragging");
+  const mv=ev=>{if(el.classList.contains("max")){const ratio=sx/innerWidth;el.classList.remove("max");ox=ev.clientX-w.w*ratio;oy=0;sx=ev.clientX;sy=ev.clientY}
+   nx=ox+ev.clientX-sx;ny=Math.max(0,oy+ev.clientY-sy);if(!raf)raf=requestAnimationFrame(()=>{raf=0;w.x=nx;w.y=ny;place(w)})};
+  const up=()=>{tb.removeEventListener("pointermove",mv);tb.removeEventListener("pointerup",up);tb.removeEventListener("pointercancel",up);el.classList.remove("dragging");persist();wake()};
+  tb.addEventListener("pointermove",mv);tb.addEventListener("pointerup",up);tb.addEventListener("pointercancel",up)})}
+function resizeWin(w){const el=w.el,rz=el.querySelector(".rz");
+ rz.addEventListener("pointerdown",e=>{e.stopPropagation();rz.setPointerCapture(e.pointerId);const sx=e.clientX,sy=e.clientY,ow=w.w,oh=w.h;let raf=0;el.classList.add("dragging");
+  const mv=ev=>{w.w=Math.max(320,ow+ev.clientX-sx);w.h=Math.max(200,oh+ev.clientY-sy);if(!raf)raf=requestAnimationFrame(()=>{raf=0;el.style.width=w.w+"px";el.style.height=w.h+"px"})};
+  const up=()=>{rz.removeEventListener("pointermove",mv);rz.removeEventListener("pointerup",up);el.classList.remove("dragging");persist()};
+  rz.addEventListener("pointermove",mv);rz.addEventListener("pointerup",up)})}
+function tileAll(){const vs=[...WM.wins.values()].filter(w=>!w.min);if(!vs.length)return;const c=Math.ceil(Math.sqrt(vs.length)),r=Math.ceil(vs.length/c),W0=desk.clientWidth,H0=desk.clientHeight-90,g=14;
+ vs.forEach((w,i)=>{w.el.classList.remove("max");w.el.classList.add("anim");Object.assign(w,{x:g+(i%c)*(W0/c),y:g+Math.floor(i/c)*(H0/r),w:W0/c-g*2,h:H0/r-g*2});w.el.style.width=w.w+"px";w.el.style.height=w.h+"px";place(w);setTimeout(()=>w.el.classList.remove("anim"),350)});persist();wake()}
+
+/* =========================================================
+   6. DOCK — 가우시안 배율, transform만 사용 (레이아웃 변경 없음)
+   ========================================================= */
+const DOCK=["finder","blog","terminal","crypto","about","contact","settings"];
+function buildDock(){const d=$("#dock");d.innerHTML="";
+ DOCK.forEach(a=>d.appendChild(dockItem(a,APPS[a].name,ICON_SVG[APPS[a].icon])));d.insertAdjacentHTML("beforeend",`<div class="dsep"></div>`);d.appendChild(dockItem("trash","휴지통",ICON_SVG.trash));
+ const items=[...d.querySelectorAll(".dk")];let raf=0,mx=null;
+ const apply=()=>{raf=0;items.forEach(it=>{if(mx==null){it.style.transform="";return}const r=it.getBoundingClientRect(),dist=mx-(r.left+r.width/2);const k=Math.exp(-(dist*dist)/2600);it.style.transform=`translateY(${-14*k}px) scale(${1+.42*k})`})};
+ d.addEventListener("mousemove",e=>{if(mobile())return;mx=e.clientX;if(!raf)raf=requestAnimationFrame(apply)});
+ d.addEventListener("mouseleave",()=>{mx=null;if(!raf)raf=requestAnimationFrame(apply)});
+ d.addEventListener("click",e=>{const b=e.target.closest(".dk");if(b)dockClick(b.dataset.app)})}
+function dockItem(id,name,svg){const b=document.createElement("button");b.className="dk";b.dataset.app=id;b.setAttribute("aria-label",name);b.innerHTML=`<span class="tip">${name}</span><div class="ico">${svg}</div><span class="run"></span>`;return b}
+function dockClick(a){if(a==="trash")return openApp("finder",{path:["trash"]});
+ const ws=[...WM.wins.values()].filter(w=>w.app===a);if(!ws.length){bounce(a);return openApp(a)}
+ const vis=ws.filter(w=>!w.min);if(!vis.length)return restore(ws[ws.length-1].id);
+ const top=vis.sort((x,y)=>y.el.style.zIndex-x.el.style.zIndex)[0];if(top.id===WM.active)return minimize(top.id);focus(top.id)}
+function bounce(a){const el=$(`.dk[data-app="${a}"]`);if(!el||reduceMotion)return;el.classList.remove("bounce");void el.offsetWidth;el.classList.add("bounce");setTimeout(()=>el.classList.remove("bounce"),1000)}
+function syncDock(){$$(".dk").forEach(d=>d.classList.toggle("running",[...WM.wins.values()].some(w=>w.app===d.dataset.app)))}
+
+/* =========================================================
+   7. APPS (WindowWrapper 패턴: 등록만 하면 창·Dock·메뉴가 자동 처리)
+   ========================================================= */
+const APPS={
+ finder:{name:"탐색기",icon:"finder",w:800,h:480,render:renderFinder,onReopen:(w,arg)=>arg.path&&w.nav(arg.path)},
+ blog:{name:"블로그",icon:"blog",w:960,h:620,single:true,render:renderBlog,onReopen:(w,arg)=>w.go(arg.slug||null)},
+ terminal:{name:"터미널",icon:"terminal",w:660,h:420,render:renderTerminal},
+ crypto:{name:"개발 도구",icon:"crypto",w:560,h:440,single:true,render:renderCrypto},
+ about:{name:"about_me",icon:"about",w:540,h:520,single:true,render:renderAbout},
+ contact:{name:"연락처",icon:"contact",w:440,h:380,single:true,render:renderContact},
+ project:{name:"프로젝트",icon:"project",w:640,h:520,hidden:true,render:renderProject},
+ settings:{name:"시스템 설정",icon:"settings",w:660,h:480,single:true,render:renderSettings},
+ source:{name:"페이지 소스",icon:"source",w:780,h:520,single:true,render:b=>{b.innerHTML=`<div class="src">${PAGE_SRC.split("\n").map(l=>`<div>${esc(l)||" "}</div>`).join("")}</div>`}}
+};
+function openNode(n){if(n.type==="dir")return openApp("finder",{path:[...(n.path||[]),n.id]});if(n.type==="post")return openPost(n.slug);if(n.type==="project")return openApp("project",{id:n.id});if(n.app)return openApp(n.app)}
+function openPost(slug){openApp("blog",{slug})}
+
+/* ---------- Finder: 데이터 기반 파일 탐색기 ---------- */
+function renderFinder(body,w,arg){
+ const tools=w.el.querySelector(".tools");
+ tools.innerHTML=`<button class="tbtn bk" aria-label="뒤로"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1L2 7l6 6"/></svg></button><button class="tbtn fw" aria-label="앞으로"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l6 6-6 6"/></svg></button>
+  <button class="tbtn vg" aria-label="아이콘 보기"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><rect width="7" height="7" rx="1.5"/><rect x="9" width="7" height="7" rx="1.5"/><rect y="9" width="7" height="7" rx="1.5"/><rect x="9" y="9" width="7" height="7" rx="1.5"/></svg></button><button class="tbtn vl" aria-label="목록 보기"><svg width="15" height="13" viewBox="0 0 16 14" fill="currentColor"><rect width="16" height="2" rx="1"/><rect y="6" width="16" height="2" rx="1"/><rect y="12" width="16" height="2" rx="1"/></svg></button>
+  <label class="sfield"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg><input placeholder="검색" aria-label="이 폴더 검색"></label>`;
+ body.innerHTML=`<div class="finder"><aside></aside><div class="main"><div class="view" tabindex="0" style="flex:1;display:flex;flex-direction:column;min-height:0;position:relative;outline:none"></div><div class="pathbar"></div><div class="fstatus"></div></div></div>`;
+ const aside=body.querySelector("aside"),view=body.querySelector(".view"),q=tools.querySelector("input");
+ let path=arg.path||["posts"],mode=store.get("finderMode","grid"),sel=-1,hist=[path],hp=0,sortBy="date",items=[];
+ const label=()=>path[0]==="trash"?"휴지통":path[0]?.startsWith("tag:")?path[0].slice(4):path.length?resolve(path)?.name:"tsk";
+ function list(){let it;
+  if(path[0]==="trash")it=[{type:"file",name:"password123.txt",date:"2019-01-01",kind:"반성문",trash:true}];
+  else if(path[0]?.startsWith("tag:"))it=resolve(["posts"]).children.filter(c=>c.kind===path[0].slice(4)).map(c=>({...c,path:["posts"]}));
+  else{const n=resolve(path);it=n?n.children.map(c=>({...c,path})):[]}
+  const k=q.value.trim().toLowerCase();if(k)it=flatten().filter(n=>n.type!=="dir"&&n.name.toLowerCase().includes(k));
+  const dirs=it.filter(i=>i.type==="dir"),files=it.filter(i=>i.type!=="dir");
+  const cmp={name:(a,b)=>a.name.localeCompare(b.name,"ko"),date:(a,b)=>String(b.date).localeCompare(String(a.date)),kind:(a,b)=>String(a.kind).localeCompare(String(b.kind))}[sortBy];
+  return [...dirs.sort(cmp),...files.sort(cmp)]}
+ function icon(i,big){if(i.type==="dir")return big?`<div style="width:64px;height:54px;margin-top:14px">${ICON_SVG.folder}</div>`:mini("folder");
+  if(i.type==="post"){const p=POSTS.find(x=>x.slug===i.slug);return big&&p?thumbHTML(p):mini("doc")}
+  const ic=i.icon||(i.type==="project"?"project":"doc");return big?`<div style="width:60px;height:60px;margin-top:9px">${ICON_SVG[ic]}</div>`:mini(ic)}
+ function draw(){items=list();w.setTitle(label());w.arg={path};persist();
+  aside.innerHTML=`<h5>즐겨찾기</h5>${FS.children.filter(c=>c.type==="dir").map(c=>`<button data-p="${c.id}" class="${path[0]===c.id&&path.length===1?"on":""}">${mini(c.id==="apps"?"settings":"folder")} ${esc(c.name)}</button>`).join("")}<button data-p="trash" class="${path[0]==="trash"?"on":""}">${mini("trash")} 휴지통</button>
+   <h5>태그</h5>${[...new Set(POSTS.map(p=>p.cat))].map(k=>[k,catColor(k)]).map(([k,c])=>`<button data-p="tag:${k}" class="${path[0]==="tag:"+k?"on":""}"><span class="tagdot" style="background:${c}"></span>${esc(k)}</button>`).join("")}`;
+  tools.querySelector(".bk").disabled=hp===0;tools.querySelector(".fw").disabled=hp>=hist.length-1;
+  tools.querySelector(".vg").classList.toggle("on",mode==="grid");tools.querySelector(".vl").classList.toggle("on",mode==="list");
+  const zone=`<div class="dropzone">.md 파일을 놓으면 블로그 글로 열립니다</div>`;
+  if(mode==="grid")view.innerHTML=`<div class="grid" role="listbox">${items.map((i,x)=>`<div class="fi${sel===x?" sel":""}" data-i="${x}" role="option" title="${esc(i.name)}"><div class="th">${icon(i,true)}</div><div class="nm">${esc(i.name)}</div></div>`).join("")}</div>`+zone;
+  else view.innerHTML=`<div class="list" role="listbox"><div class="lrow lh"><span data-s="name">이름${sortBy==="name"?" ▾":""}</span><span data-s="date">수정일${sortBy==="date"?" ▾":""}</span><span data-s="kind">종류${sortBy==="kind"?" ▾":""}</span></div>${items.map((i,x)=>`<div class="lrow${sel===x?" sel":""}" data-i="${x}" role="option"><div class="n">${icon(i)}<span>${esc(i.name)}</span></div><div class="m">${esc(i.date||"")}</div><div class="m">${esc(i.type==="dir"?"폴더":i.kind||"")}</div></div>`).join("")}</div>`+zone;
+  if(!items.length)view.firstChild.insertAdjacentHTML("beforeend",`<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">항목 없음</div>`);
+  const crumbs=[["~","tsk"],...path.map((p,i)=>[p,i===0&&p.startsWith("tag:")?p.slice(4):p==="trash"?"휴지통":resolve(path.slice(0,i+1))?.name||p])];
+  body.querySelector(".pathbar").innerHTML=crumbs.map(([,n],i)=>`<button data-c="${i}">${i===0?mini("finder"):mini("folder")}${esc(n)}</button>`).join("<span>›</span>");
+  body.querySelector(".fstatus").textContent=`${items.length}개 항목${q.value?` · "${q.value}" 검색 결과`:""}`}
+ const go=p=>{path=p;sel=-1;hist=hist.slice(0,hp+1);hist.push(p);hp=hist.length-1;q.value="";draw()};
+ const activate=x=>{const i=items[x];if(!i)return;if(i.trash)return notify("열 수 없음","이 파일은 영구히 봉인되었습니다 🔒");if(i.type==="dir")return go([...i.path,i.id]);openNode(i)};
+ /* 이벤트 위임: 항목이 많아도 리스너는 몇 개뿐 */
+ aside.addEventListener("click",e=>{const b=e.target.closest("[data-p]");if(b)go([b.dataset.p])});
+ body.querySelector(".pathbar").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(b)go(path.slice(0,+b.dataset.c))});
+ view.addEventListener("click",e=>{const s=e.target.closest("[data-s]");if(s){sortBy=s.dataset.s;return draw()}const it=e.target.closest("[data-i]");if(!it){sel=-1;return draw()}sel=+it.dataset.i;if(mobile())return activate(sel);draw()});
+ view.addEventListener("dblclick",e=>{const it=e.target.closest("[data-i]");if(it)activate(+it.dataset.i)});
+ view.addEventListener("keydown",e=>{const cols=mode==="grid"?Math.max(1,Math.floor(view.clientWidth/118)):1;
+  const mv={ArrowRight:1,ArrowLeft:-1,ArrowDown:cols,ArrowUp:-cols}[e.key];
+  if(mv){e.preventDefault();sel=Math.min(items.length-1,Math.max(0,(sel<0?0:sel+mv)));draw();view.querySelector(".sel")?.scrollIntoView({block:"nearest"})}
+  else if(e.key==="Enter"&&sel>=0)activate(sel);else if(e.key==="Backspace"&&path.length>1)go(path.slice(0,-1))});
+ tools.querySelector(".bk").onclick=()=>{if(hp>0){path=hist[--hp];sel=-1;draw()}};tools.querySelector(".fw").onclick=()=>{if(hp<hist.length-1){path=hist[++hp];sel=-1;draw()}};
+ tools.querySelector(".vg").onclick=()=>{mode="grid";store.set("finderMode",mode);draw()};tools.querySelector(".vl").onclick=()=>{mode="list";store.set("finderMode",mode);draw()};
+ q.oninput=debounce(draw,120);
+ body.addEventListener("dragover",e=>{e.preventDefault();body.classList.add("dragging")});body.addEventListener("dragleave",e=>{if(!body.contains(e.relatedTarget))body.classList.remove("dragging")});
+ body.addEventListener("drop",e=>{e.preventDefault();e.stopPropagation();body.classList.remove("dragging");importFiles(e.dataTransfer.files)});
+ w.nav=go;w.view=m=>{mode=m;draw()};w.redraw=draw;draw()}
+
+/* ---------- 블로그 브라우저 (주소창·뒤로/앞으로·목차) ---------- */
+/* ---------- 블로그 브라우저 (주소창·뒤로/앞으로·목차) — 단독 HTML/티스토리 겸용 ---------- */
+function renderBlog(body,w,arg){
+ const tb=w.el.querySelector(".tbar");tb.classList.add("wide");
+ w.el.querySelector(".tools").innerHTML=`<button class="tbtn toc" aria-label="목차"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x=".8" y=".8" width="14.4" height="12.4" rx="2"/><path d="M5.5 1v12"/></svg></button><button class="tbtn fz" aria-label="글자 크기" style="font-weight:600;font-size:12px">Aa</button><button class="tbtn sh" aria-label="링크 복사"><svg width="13" height="15" viewBox="0 0 14 17" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 1v10M3.5 4.5L7 1l3.5 3.5M3 7H1.8v9h10.4V7H11"/></svg></button>`;
+ tb.querySelector(".tl").insertAdjacentHTML("afterend",`<button class="tbtn bk" aria-label="뒤로" style="margin-left:10px"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1L2 7l6 6"/></svg></button><button class="tbtn fw" aria-label="앞으로"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l6 6-6 6"/></svg></button><div class="addr"></div>`);
+ let hist=[],hp=-1,fs=store.get("fontSize",15),tocOn=innerWidth>=900,filter=arg.filter||"전체";
+ const lockIco=`<svg width="10" height="12" viewBox="0 0 24 28" fill="currentColor"><rect x="2" y="12" width="20" height="15" rx="3"/><path d="M6 12V8a6 6 0 0112 0v4" fill="none" stroke="currentColor" stroke-width="3"/></svg>`;
+ function setURL(p){if(TT){const path=p?new URL(p.link,location.href).pathname:"/";if(location.pathname!==path)try{history.replaceState(null,"",path)}catch{}}
+  else if(p)history.replaceState(null,"","#"+p.slug);else if(location.hash)history.replaceState(null,"",location.pathname+location.search)}
+ function show(slug,push=true){const p=slug?findPost(slug):null;slug=p?p.slug:null;w.arg=slug?{slug}:{};persist();
+  if(push){hist=hist.slice(0,hp+1);hist.push(slug);hp=hist.length-1}
+  tb.querySelector(".bk").disabled=hp<=0;tb.querySelector(".fw").disabled=hp>=hist.length-1;
+  const path=p?(TT?decodeURI(new URL(p.link,location.href).pathname):"/blog/"+String(p.slug).replace(/^\/+/,"")):(TT?"/":"/blog");
+  tb.querySelector(".addr").innerHTML=`${lockIco}<b>${esc(TT?location.host:BLOG.host)}</b>${esc(path)}`;
+  setURL(p);p?article(p):home()}
+ function home(){w.setTitle(BLOG.title);const cats=["전체",...new Set(POSTS.map(p=>p.cat))];if(!cats.includes(filter))filter="전체";const ps=POSTS.filter(p=>filter==="전체"||p.cat===filter);
+  body.innerHTML=`<div class="home"><h1>${esc(BLOG.title)}</h1><div class="lead">${esc(BLOG.desc)} · 글 ${POSTS.length}편</div>
+   <div class="chips">${cats.map(c=>`<button class="chip ${c===filter?"on":""}" data-f="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+   <div class="cards">${ps.map(p=>`<button class="pcard" data-s="${esc(p.slug)}">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:4px">`:""}<span class="c" style="color:${catColor(p.cat)}">${esc(p.cat)} · ${esc(p.date)}</span><b>${esc(p.title)}</b><p>${esc(summary(p))}</p><span class="c" style="color:var(--muted)">${p.read}분${p.tags.length?" · "+p.tags.map(t=>"#"+esc(t)).join(" "):""}</span></button>`).join("")||`<div style="color:var(--muted);padding:30px 0">아직 글이 없습니다.</div>`}</div></div>`;
+  body.onclick=e=>{const f=e.target.closest("[data-f]");if(f){filter=f.dataset.f;return home()}const s=e.target.closest("[data-s]");if(s)show(s.dataset.s)};
+  w.el.querySelector(".toc").onclick=w.el.querySelector(".fz").onclick=null;w.el.querySelector(".sh").onclick=()=>copyLink(TT?BLOG.link:location.href.split("#")[0])}
+ async function copyLink(u){try{await navigator.clipboard.writeText(u);notify("링크 복사됨","주소를 클립보드에 복사했습니다","blog")}catch{notify("복사 실패","브라우저가 클립보드 접근을 막았습니다","blog")}}
+ function article(p){w.setTitle(p.title);const i=POSTS.indexOf(p),n=POSTS.length;
+  body.innerHTML=`<div class="reader" style="flex-direction:column"><div style="display:flex;flex:1;min-height:0"><nav style="${tocOn?"":"display:none"}"><h5>목차</h5></nav>
+   <div class="scroll"><div class="progress"></div><article class="post" style="font-size:${fs}px"><div class="meta">${esc(p.date)} · ${esc(p.cat)} · ${p.read}분 읽기</div><h1>${esc(p.title)}</h1><div class="tags">${p.tags.map(t=>`<span>#${esc(t)}</span>`).join("")}</div><div class="content"></div>
+   ${(TT&&!p.node)||p.ext?`<div class="card" style="margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px"><span>${p.ext?"티스토리 원문에서 댓글을 남길 수 있어요.":"댓글과 공감은 원문 페이지에서 볼 수 있어요."}</span><a class="btn pri" style="text-decoration:none" href="${esc(p.link)}"${p.ext?' target="_blank" rel="noopener"':""}>${p.ext?"티스토리에서 보기":"원문 · 댓글 보기"}</a></div>`:""}
+   <hr style="border:0;border-top:1px solid var(--line);margin:40px 0 16px"><div class="btns">${n>1?`<button class="btn" data-s="${esc(POSTS[(i-1+n)%n].slug)}">← 이전 글</button>`:""}<button class="btn" data-home>목록</button>${n>1?`<button class="btn pri" data-s="${esc(POSTS[(i+1)%n].slug)}">다음 글 →</button>`:""}</div></article></div></div>
+   <div class="rstatus"><span class="wc"></span><span class="pct">0%</span></div></div>`;
+  const content=body.querySelector(".content");
+  if(p.node)content.appendChild(p.node);else content.innerHTML=postHTML(p);   /* 티스토리 본문 DOM은 '이동'시켜 댓글 앱 상태를 유지 */
+  content.querySelectorAll("pre").forEach(pre=>{if(!pre.querySelector(".cpy"))pre.insertAdjacentHTML("afterbegin",'<button class="cpy">복사</button>')});
+  const hs=[...content.querySelectorAll("h2,h3")];hs.forEach((h,k)=>h.id=h.id||"h"+k);
+  const nav=body.querySelector("nav");nav.insertAdjacentHTML("beforeend",hs.map(h=>`<a data-h="${esc(h.id)}" style="${h.tagName==="H3"?"padding-left:20px;font-size:12px":""}">${esc(h.textContent.trim())}</a>`).join("")||'<span style="color:var(--muted);font-size:12px;padding:0 8px">목차 없음</span>');
+  body.querySelector(".wc").textContent=`${textOf(postHTML(p)).trim().split(/\s+/).length.toLocaleString()}단어 · 약 ${p.read}분`;
+  const sc=body.querySelector(".scroll"),art=body.querySelector(".post"),bar=body.querySelector(".progress"),pct=body.querySelector(".pct"),links=[...nav.querySelectorAll("a")];let raf=0;
+  sc.addEventListener("scroll",()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const r=sc.scrollTop/Math.max(1,sc.scrollHeight-sc.clientHeight);bar.style.transform=`scaleX(${r})`;pct.textContent=Math.round(r*100)+"%";
+   let on=0;hs.forEach((h,k)=>{if(h.getBoundingClientRect().top-sc.getBoundingClientRect().top<120)on=k});links.forEach((a,k)=>a.classList.toggle("on",k===on))})},{passive:true});
+  body.onclick=async e=>{const a=e.target.closest("[data-h]");if(a)return document.getElementById(a.dataset.h)?.scrollIntoView({behavior:reduceMotion?"auto":"smooth"});
+   const s=e.target.closest("[data-s]");if(s)return show(s.dataset.s);if(e.target.closest("[data-home]"))return show(null);
+   const c=e.target.closest(".cpy");if(c){const pre=c.closest("pre"),cl=pre.cloneNode(true);cl.querySelector(".cpy")?.remove();try{await navigator.clipboard.writeText((cl.querySelector("code")||cl).innerText);c.textContent="복사됨 ✓"}catch{c.textContent="복사 불가"}setTimeout(()=>c.textContent="복사",1200)}};
+  w.el.querySelector(".toc").onclick=()=>{tocOn=!tocOn;nav.style.display=tocOn?"":"none"};
+  w.el.querySelector(".fz").onclick=()=>{fs=fs>=18?14:fs+1;art.style.fontSize=fs+"px";store.set("fontSize",fs)};
+  w.el.querySelector(".sh").onclick=()=>copyLink(TT||p.ext?p.link:location.href.split("#")[0]+"#"+p.slug)}
+ tb.querySelector(".bk").onclick=()=>{if(hp>0)show(hist[--hp],false)};tb.querySelector(".fw").onclick=()=>{if(hp<hist.length-1)show(hist[++hp],false)};
+ w.go=s=>show(s);w.redraw=()=>show(hist[hp]??null,false);show(arg.slug||null)}
+function summary(p){return p.sum||(p.sum=textOf(postHTML(p)).replace(/\s+/g," ").trim().slice(0,140))}
+
+/* ---------- 프로젝트 상세 ---------- */
+function renderProject(body,w,arg){const p=PROJECTS.find(x=>x.id===arg.id);w.setTitle(p.name);
+ body.innerHTML=`<div class="pad proj"><div style="display:flex;gap:14px;align-items:center"><div style="width:56px;height:56px">${ICON_SVG.project}</div><div><h2>${esc(p.name)}</h2><div class="sub" style="margin:0">${esc(p.sub)}</div></div></div>
+  <p style="margin-top:16px">${esc(p.desc)}</p><ul style="margin-top:10px">${p.points.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  <div class="kv"><span>상태</span><span>${esc(p.status)}</span><span>기술</span><span class="stack">${p.stack.map(s=>`<span>${esc(s)}</span>`).join("")}</span>${p.link?`<span>링크</span><span><a href="${p.link}" target="_blank" rel="noopener">${esc(p.link.replace("https://",""))}</a></span>`:""}</div>${projectPost(p)?`<div class="btns" style="margin-top:6px"><button class="btn pri" data-post="${esc(projectPost(p).slug)}">개발 일지 읽기 →</button></div>`:""}</div>`;
+ body.onclick=e=>{const b=e.target.closest("[data-post]");if(b)openPost(b.dataset.post)}}
+
+/* ---------- about / contact ---------- */
+function renderAbout(body){body.innerHTML=`<div class="pad"><h2>김태섭 <span style="color:var(--muted);font-weight:400;font-size:14px">/ TSK2</span></h2><div class="sub">$ whoami → 만들고 기록하는 사람</div>
+ <p>ICT융합공학부 학생입니다. 이것저것 만들어 보는 걸 좋아해서 앱·확장 프로그램 같은 개발 기록을 남기고, 보안 공부한 내용과 소소한 일상 이야기도 같이 씁니다.</p>
+ <h3 style="margin:18px 0 6px;font-size:14px">관심 있는 것</h3>${Object.entries(SKILLS).map(([k,v])=>`<div style="display:flex;gap:10px;margin:4px 0;font-size:13px"><b style="width:80px;flex:none;color:var(--muted);font-weight:500">${k}</b><span class="stack">${v.map(s=>`<span>${esc(s)}</span>`).join("")}</span></div>`).join("")}
+ <h3 style="margin:18px 0 6px;font-size:14px">프로젝트</h3>${PROJECTS.map(p=>`<button class="btn" data-p="${p.id}">${esc(p.name)} — ${esc(p.sub)}</button>`).join("")}
+ <p style="margin-top:18px;color:var(--muted);font-size:12px">편하게 둘러보고, 댓글로 이야기 걸어 주세요.</p></div>`;
+ body.onclick=e=>{const b=e.target.closest("[data-p]");if(b)openApp("project",{id:b.dataset.p})}}
+
+function renderContact(body){body.innerHTML=`<div class="pad" style="text-align:center"><div style="width:64px;height:64px;margin:6px auto 10px">${ICON_SVG.contact}</div><h2>연락하기</h2><p style="color:var(--muted);font-size:13px">글에 대한 질문이나 피드백은 GitHub로 남겨 주세요.</p>
+ <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px;align-items:center"><a class="btn pri" style="text-decoration:none;width:220px" href="https://github.com/TSK2" target="_blank" rel="noopener">GitHub — TSK2</a><button class="btn" style="width:220px" data-copy="https://github.com/TSK2">GitHub 주소 복사</button></div></div>`;
+ body.onclick=async e=>{const b=e.target.closest("[data-copy]");if(b){try{await navigator.clipboard.writeText(b.dataset.copy);notify("복사됨","GitHub 주소를 복사했습니다","contact")}catch{notify("복사 실패","클립보드 접근이 막혀 있습니다","contact")}}}}
+
+/* ---------- 터미널 (같은 파일 트리 사용) ---------- */
+function renderTerminal(body,w,arg){body.innerHTML=`<div class="term"></div>`;const T=body.firstChild;let cwd=arg.cwd||[],hist=store.get("termHist",[]),hi=hist.length;w.setTitle("tsk — -zsh — 80×24");
+ const out=(h,c="")=>{const d=document.createElement("div");d.className="ln "+c;d.innerHTML=h;T.insertBefore(d,line);T.scrollTop=T.scrollHeight};
+ const pwd=()=>"~"+(cwd.length?"/"+cwd.join("/"):"");
+ const line=document.createElement("div");line.className="ln";line.innerHTML=`<span class="p">tsk@ts2k</span> <span class="h cw">~</span> % <input spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="터미널 입력">`;T.appendChild(line);
+ const inp=line.querySelector("input"),cw=line.querySelector(".cw");T.onclick=()=>inp.focus();
+ const kids=()=>resolve(cwd)?.children||[];const nm=c=>c.type==="dir"?c.id:c.file;
+ out(`Last login: ${new Date().toLocaleString("ko-KR")} on ttys000\n<span class="y">help</span> 를 입력해 명령어를 확인하세요.`);
+ const C={
+  help:()=>out(`<span class="h">about</span>, <span class="h">skills</span>, <span class="h">projects</span>, <span class="h">contact</span>   나에 대해
+<span class="h">ls</span>, <span class="h">cd</span>, <span class="h">pwd</span>, <span class="h">tree</span>           파일 둘러보기
+<span class="h">cat</span> &lt;파일&gt;  ·  <span class="h">open</span> &lt;파일|.&gt;
+<span class="h">grep</span> &lt;단어&gt;       모든 글 본문 검색
+<span class="h">fortune</span>, <span class="h">coffee</span>   잠깐 쉬어가기
+<span class="h">sha256</span>, <span class="h">b64</span> &lt;텍스트&gt;
+<span class="h">theme</span> &lt;${Object.keys(WALLS).join("|")}&gt;  ·  <span class="h">appearance</span> &lt;dark|light&gt;
+<span class="h">neofetch</span>, <span class="h">date</span>, <span class="h">history</span>, <span class="h">clear</span>, <span class="h">exit</span>`),
+  about:()=>out("김태섭 (TSK2) — ICT융합공학부 학생.\n개발 기록, 공부한 것, 가끔은 잡담. → <span class='h'>open about_me.txt</span>"),
+  skills:()=>out(Object.entries(SKILLS).map(([k,v])=>`<span class="y">${k.padEnd(10)}</span> ${v.join(" · ")}`).join("\n")),
+  projects:()=>out([...PROJECTS.map(p=>`<span class="p">${p.name}</span>  ${esc(p.sub)}\n  └ ${esc(p.status)}  (open ${p.id})`),...POSTS.filter(p=>isProjectPost(p)&&!PROJECTS.some(q=>q.post&&p.title.includes(q.post))).map(p=>`<span class="h">${esc(p.title)}</span>\n  └ ${esc(p.date)}  (open ${esc(p.file||p.slug)})`)].join("\n")),
+  contact:()=>out("GitHub  https://github.com/TSK2"),
+  ls:a=>{const l=a==="-l";const k=kids();out(k.map(c=>l?`${c.type==="dir"?"d":"-"}rw-r--r--  tsk  ${String(c.date||"").padEnd(10)}  ${c.type==="dir"?`<span class="h">${c.id}/</span>`:esc(nm(c))}`:(c.type==="dir"?`<span class="h">${c.id}/</span>`:esc(nm(c)))).join(l?"\n":"   ")||"(비어 있음)")},
+  pwd:()=>out(pwd()),
+  tree:()=>{const walk=(n,pre)=>n.children.map((c,i)=>{const last=i===n.children.length-1,s=pre+(last?"└── ":"├── ")+(c.type==="dir"?`<span class="h">${c.id}/</span>`:esc(nm(c)));return c.type==="dir"?s+"\n"+walk(c,pre+(last?"    ":"│   ")):s}).join("\n");out("~\n"+walk(FS,""))},
+  cd:a=>{a=(a||"~").replace(/\/$/,"");if(a==="~"||a==="/")cwd=[];else if(a==="..")cwd=cwd.slice(0,-1);else{const d=kids().find(c=>c.type==="dir"&&(c.id===a||c.name===a));if(!d)return out(`cd: no such file or directory: ${esc(a)}`,"e");cwd=[...cwd,d.id]}cw.textContent=pwd()},
+  cat:a=>{const n=kids().find(c=>nm(c)===a)||flatten().find(c=>nm(c)===a);if(!n)return out(`cat: ${esc(a||"")}: No such file or directory`,"e");
+   if(n.type==="post"){const p=findPost(n.slug);return out(`<span class="y"># ${esc(p.title)}</span>\n`+esc(textOf(postHTML(p)).trim()))}if(n.app==="about")return C.about();if(n.type==="project")return C.projects();out(`cat: ${esc(a)}: 바이너리 파일입니다`,"e")},
+  open:a=>{if(!a||a===".")return openApp("finder",{path:cwd.length?cwd:["posts"]});const n=kids().find(c=>nm(c)===a||c.id===a)||flatten().find(c=>nm(c)===a||c.id===a);n?openNode(n):out(`The file ${esc(a)} does not exist.`,"e")},
+  grep:a=>{if(!a)return out("usage: grep <단어>","e");const r=POSTS.flatMap(p=>textOf(postHTML(p)).split("\n").filter(l=>l.toLowerCase().includes(a.toLowerCase())).map(l=>`<span class="p">${p.slug}.md</span>: ${esc(l.trim()).replace(new RegExp(a.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>`<span class="y">${m}</span>`)}`));out(r.join("\n")||"일치하는 내용 없음")},
+  whoami:()=>out("tsk2"),
+  neofetch:()=>out(`<span class="p">      ▄███▄      </span>  <span class="p">tsk</span>@<span class="p">sec</span>
+<span class="p">    ▄███████▄    </span>  ---------
+<span class="p">   ███  ✓  ███   </span>  OS: ${esc(BLOG.title)} desktop 4.0
+<span class="p">   ▀█████████▀   </span>  Shell: zsh (fake)
+<span class="p">     ▀█████▀     </span>  Posts: ${POSTS.length} · Projects: ${PROJECTS.length}
+<span class="p">       ▀▀▀       </span>  Theme: ${document.body.dataset.theme} · ${WALLS[wp]}`),
+  fortune:()=>{const F=["작게 만들고, 자주 올리자.","버그는 숨지 않는다. 내가 못 찾을 뿐.","오늘의 커밋이 내일의 나를 구한다.","일단 돌아가게, 그다음 예쁘게.","README를 쓰면 미래의 내가 고마워한다.","산책도 디버깅이다.","커피 한 잔 = 버그 하나 (확률적으로)"];out("🥠 "+F[Math.random()*F.length|0],"y")},
+  coffee:()=>out("    ( (\n     ) )\n  ........\n  |      |]\n  \\      /\n   `----'   커피 한 잔 내렸어요 ☕"),
+  sha256:async a=>a?out(await sha(a)):out("usage: sha256 <text>","e"),
+  b64:a=>a?out(btoa(unescape(encodeURIComponent(a)))):out("usage: b64 <text>","e"),
+  theme:a=>{if(!WALLS[a])return out("usage: theme "+Object.keys(WALLS).join("|"),"e");setWall(a);out("wallpaper → "+WALLS[a])},
+  appearance:a=>{if(!["dark","light"].includes(a))return out("usage: appearance dark|light","e");setTheme(a);out("appearance → "+a)},
+  date:()=>out(new Date().toString()),history:()=>out(hist.map((h,i)=>`${String(i+1).padStart(4)}  ${esc(h)}`).join("\n")),
+  clear:()=>{[...T.children].forEach(c=>c!==line&&c.remove())},exit:()=>closeWin(w.id),
+  sudo:()=>out("tsk is not in the sudoers file. This incident will be reported. 🚨","e"),rm:a=>out(a&&a.includes("-rf")?"nice try 😏":"rm: permission denied","e")};
+ inp.addEventListener("keydown",async e=>{
+  if(e.key==="Enter"){const v=inp.value.trim();inp.value="";out(`<span class="p">tsk@ts2k</span> <span class="h">${pwd()}</span> % ${esc(v)}`);if(!v)return;hist.push(v);hist=hist.slice(-100);hi=hist.length;store.set("termHist",hist);
+   const [c,...r]=v.split(/\s+/);const f=C[c];f?await f(r.join(" ")):out(`zsh: command not found: ${esc(c)}`,"e")}
+  else if(e.key==="ArrowUp"){if(hi>0)inp.value=hist[--hi];e.preventDefault()}
+  else if(e.key==="ArrowDown"){inp.value=hi<hist.length-1?hist[++hi]:(hi=hist.length,"")}
+  else if(e.key==="Tab"){e.preventDefault();const [c,...r]=inp.value.split(" ");const a=r.join(" ");const pool=r.length?kids().map(nm):Object.keys(C);const m=pool.filter(k=>k.startsWith(r.length?a:c));
+   if(m.length===1)inp.value=r.length?c+" "+m[0]:m[0]+" ";else if(m.length)out(m.join("  "))}
+  else if((e.key==="l"||e.key==="k")&&(e.ctrlKey||e.metaKey)){e.preventDefault();C.clear()}})}
+
+/* ---------- 개발 도구 ---------- */
+function renderCrypto(body){body.innerHTML=`<div class="tool"><textarea class="in" placeholder="변환할 텍스트를 입력하세요" aria-label="입력">{"hello":"world","list":[1,2,3]}</textarea>
+ <div class="btns"><button class="btn" data-f="b64e">Base64 인코딩</button><button class="btn" data-f="b64d">Base64 디코딩</button><button class="btn" data-f="urle">URL 인코딩</button><button class="btn" data-f="urld">URL 디코딩</button><button class="btn" data-f="hex">Hex</button><button class="btn" data-f="sha1">SHA-1</button><button class="btn pri" data-f="sha256">SHA-256</button><button class="btn" data-f="jwt">JWT 디코드</button><button class="btn" data-f="json">JSON 정리</button><button class="btn" data-f="count">글자 수</button><button class="btn" data-f="case">대소문자 변환</button></div>
+ <textarea class="out" readonly placeholder="결과" aria-label="결과"></textarea><div class="btns"><button class="btn cp">결과 복사</button><span style="font-size:11.5px;color:var(--muted)">모든 계산은 브라우저 안에서만 수행됩니다.</span></div></div>`;
+ const i=body.querySelector(".in"),o=body.querySelector(".out");
+ const F={b64e:s=>btoa(unescape(encodeURIComponent(s))),b64d:s=>decodeURIComponent(escape(atob(s.trim()))),urle:encodeURIComponent,urld:decodeURIComponent,
+  hex:s=>[...new TextEncoder().encode(s)].map(b=>b.toString(16).padStart(2,"0")).join(" "),sha1:s=>sha(s,"SHA-1"),sha256:s=>sha(s),
+  json:s=>JSON.stringify(JSON.parse(s),null,2),count:s=>`글자 수: ${[...s].length}\n공백 제외: ${[...s.replace(/\s/g,"")].length}\n바이트(UTF-8): ${new TextEncoder().encode(s).length}\n줄 수: ${s.split("\n").length}\n단어 수: ${(s.trim().match(/\S+/g)||[]).length}`,case:s=>s===s.toUpperCase()?s.toLowerCase():s.toUpperCase(),
+  jwt:s=>{const p=s.trim().split(".");if(p.length<2)throw 0;const d=x=>JSON.stringify(JSON.parse(decodeURIComponent(escape(atob(x.replace(/-/g,"+").replace(/_/g,"/"))))),null,2);return "// header\n"+d(p[0])+"\n\n// payload\n"+d(p[1])+"\n\n// ⚠ 서명은 검증하지 않았습니다"}};
+ body.onclick=async e=>{const b=e.target.closest("[data-f]");if(b){try{o.value=await F[b.dataset.f](i.value)}catch{o.value="⚠ 입력 형식이 올바르지 않습니다"}}
+  if(e.target.closest(".cp")){try{await navigator.clipboard.writeText(o.value);notify("복사됨","결과를 클립보드에 복사했습니다","crypto")}catch{notify("복사 실패","클립보드 접근이 막혀 있습니다","crypto")}}}}
+
+/* ---------- 설정 ---------- */
+function renderSettings(body,w,arg){const cols=["#0a84ff","#bf5af2","#ff375f","#ff9f0a","#ffd60a","#30d158","#22d3a6","#8e8e93"];let tab=arg.tab||"look";
+ const draw=()=>{body.innerHTML=`<div class="prefs"><aside>${[["look","모양"],["wall","배경화면"],["system","성능 · 세션"],["about","이 블로그에 관하여"]].map(([k,v])=>`<button data-t="${k}" class="${tab===k?"on":""}">${v}</button>`).join("")}</aside><div class="pane"></div></div>`;
+  const pane=body.querySelector(".pane");w.setTitle({look:"모양",wall:"배경화면",system:"성능 · 세션",about:"이 블로그에 관하여"}[tab]);
+  if(tab==="look"){const th=document.body.dataset.theme,ac=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+   pane.innerHTML=`<div class="card"><h3>화면 모드</h3><div class="choices">${[["dark","다크","#1e2026"],["light","라이트","#f2f2f5"]].map(([k,v,c])=>`<button class="choice ${th===k?"on":""}" data-th="${k}"><div class="pv" style="background:linear-gradient(135deg,${c} 55%,var(--accent))"></div>${v}</button>`).join("")}</div></div>
+    <div class="card"><h3>강조 색상</h3><div class="swatches">${cols.map(c=>`<button class="sw ${ac===c?"on":""}" data-c="${c}" style="background:${c};color:${c}" aria-label="강조색 ${c}"></button>`).join("")}</div></div>`}
+  if(tab==="wall")pane.innerHTML=`<div class="card"><h3>동적 배경화면</h3><div class="choices">${Object.entries(WALLS).map(([k,v])=>`<button class="choice ${wp===k?"on":""}" data-w="${k}"><div class="pv" style="background:${{aurora:"radial-gradient(circle at 30% 30%,var(--accent),transparent 60%),radial-gradient(circle at 75% 40%,#a855f7,transparent 55%),#060a12",sunset:"linear-gradient(#2b1055,#d6455d 55%,#ff9a3c)",stars:"radial-gradient(circle at 80% 25%,#fff4d6 0 6px,transparent 7px),linear-gradient(#030712,#1b1f3b)",net:"radial-gradient(#0b1a1d,#03060a)"}[k]}"></div>${v}</button>`).join("")}</div></div>`;
+  if(tab==="system")pane.innerHTML=`<div class="card" style="font-size:12.5px;line-height:1.9"><h3>자동 최적화</h3>• 배경 애니메이션: 최대 30fps, 해상도 상한 1.5배<br>• 탭이 숨겨지거나 창이 화면을 가득 채우면 배경 정지<br>• 시스템 '동작 줄이기' 설정 시 애니메이션 끔: <b>${reduceMotion?"켜짐":"꺼짐"}</b><br>• 창 드래그·Dock 확대는 transform만 사용 (레이아웃 재계산 없음)</div>
+   <div class="card"><h3>세션</h3><p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">열린 창의 위치·크기를 기억했다가 다음 방문 때 복원합니다.</p><div class="btns"><button class="btn" data-reset>세션·설정 초기화</button></div></div>`;
+  if(tab==="about")pane.innerHTML=`<div style="text-align:center;padding:10px 0">${ICON_SVG.finder.replace('class="ai"','width="84" height="84"')}<h2 style="margin:12px 0 2px">${esc(BLOG.title)}</h2><div style="color:var(--muted)">데스크톱 블로그 4.0</div>
+   <div class="card" style="text-align:left;margin-top:18px;font-size:12.5px;line-height:1.9">글 ${POSTS.length}편 · 프로젝트 ${PROJECTS.length}개 · 앱 ${Object.keys(APPS).length}개<br>단축키: <b>⌘/Ctrl+K</b> 빠른 검색 · <b>⌘/Ctrl+\`</b> 터미널 · <b>⌥⌘W</b> 창 닫기 · <b>F3</b> 모든 창 보기<br>daedalOS(dustinbrett.com), macOS 스타일 포트폴리오 오픈소스들의 구조를 참고해 새로 작성했습니다.</div></div>`};
+ body.onclick=e=>{const t=e.target.closest("[data-t]");if(t){tab=t.dataset.t;return draw()}const th=e.target.closest("[data-th]");if(th){setTheme(th.dataset.th);return draw()}
+  const c=e.target.closest("[data-c]");if(c){setAccent(c.dataset.c);return draw()}const wv=e.target.closest("[data-w]");if(wv){setWall(wv.dataset.w);return draw()}
+  if(e.target.closest("[data-reset]")){try{Object.keys(localStorage).filter(k=>k.startsWith("tsk3-")).forEach(k=>localStorage.removeItem(k))}catch{}notify("초기화됨","새로 고침하면 기본 상태로 시작합니다","settings")}};draw()}
+
+/* =========================================================
+   8. DESKTOP ICONS + HERO
+   ========================================================= */
+const DESKF=()=>[{id:"posts",label:"블로그 글",icon:"folder",open:()=>openApp("finder",{path:["posts"]})},{id:"projects",label:"프로젝트",icon:"folder",open:()=>openApp("finder",{path:["projects"]})},
+ ...(latest()?[{id:"latest",label:"최신 글",icon:"thumb",open:()=>openPost(latest().slug)}]:[]),{id:"aboutme",label:"about_me.txt",icon:"doc",open:()=>openApp("about")}];
+function layoutIcons(){if(!FS)return;const rows=Math.max(1,Math.floor((desk.clientHeight-90)/104));
+ DESKF().forEach((d,i)=>{let el=document.getElementById("ic-"+d.id);
+  if(!el){el=document.createElement("div");el.className="icon";el.id="ic-"+d.id;el.tabIndex=0;el.setAttribute("role","button");el.setAttribute("aria-label",d.label);
+   const g=d.icon==="thumb"?`<div style="width:44px;height:53px"><div style="transform:scale(.68);transform-origin:0 0">${thumbHTML(latest())}</div></div>`:ICON_SVG[d.icon];
+   el.innerHTML=`<div class="glyph">${g}</div><span>${d.label}</span>`;desk.appendChild(el);
+   el.addEventListener("dblclick",()=>{d.open();clearSel()});el.addEventListener("keydown",e=>{if(e.key==="Enter")d.open()});
+   el.addEventListener("click",e=>{if(mobile()){d.open();return}if(!e.metaKey&&!e.shiftKey)clearSel();el.classList.add("sel")});dragIcon(el,d.id)}
+  const pos=store.get("icons",{})[d.id];
+  if(pos){el.style.left=pos[0]+"px";el.style.top=pos[1]+"px"}else{el.style.left=(desk.clientWidth-104-Math.floor(i/rows)*100)+"px";el.style.top=(12+(i%rows)*104)+"px"}})}
+function clearSel(){$$(".icon.sel").forEach(e=>e.classList.remove("sel"))}
+function dragIcon(el,id){el.addEventListener("pointerdown",e=>{if(e.button)return;e.stopPropagation();closePops();el.setPointerCapture(e.pointerId);const sx=e.clientX,sy=e.clientY,ox=el.offsetLeft,oy=el.offsetTop;let moved=false;
+ const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!moved&&Math.hypot(dx,dy)<5)return;moved=true;el.style.left=ox+dx+"px";el.style.top=oy+dy+"px"};
+ const up=()=>{el.removeEventListener("pointermove",mv);el.removeEventListener("pointerup",up);if(moved){const all=store.get("icons",{});all[id]=[el.offsetLeft,el.offsetTop];store.set("icons",all)}};
+ el.addEventListener("pointermove",mv);el.addEventListener("pointerup",up)})}
+desk.addEventListener("pointerdown",e=>{if(e.target!==desk&&!e.target.closest("#hero")||e.button)return;closePops();clearSel();blurAll();const b=$("#selbox"),r0=desk.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;let raf=0,ev0;
+ const icons=$$(".icon").map(ic=>[ic,ic.getBoundingClientRect()]);
+ const mv=ev=>{ev0=ev;if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const x=Math.min(sx,ev0.clientX),y=Math.min(sy,ev0.clientY),w=Math.abs(ev0.clientX-sx),h=Math.abs(ev0.clientY-sy);
+  Object.assign(b.style,{display:"block",left:x-r0.left+"px",top:y-r0.top+"px",width:w+"px",height:h+"px"});icons.forEach(([ic,r])=>ic.classList.toggle("sel",r.left<x+w&&r.right>x&&r.top<y+h&&r.bottom>y))})};
+ const up=()=>{b.style.display="none";removeEventListener("pointermove",mv);removeEventListener("pointerup",up)};addEventListener("pointermove",mv);addEventListener("pointerup",up)});
+/* 가변 폰트 굵기 hover (kishan 포트폴리오의 Welcome 효과를 GSAP 없이 CSS transition으로) */
+function setupHero(){$$("#hero [data-w]").forEach(el=>{const [min,max,base]=el.dataset.w.split(",").map(Number);el.innerHTML=[...el.textContent].map(c=>`<span style="font-weight:${base}">${c===" "?"&nbsp;":esc(c)}</span>`).join("");
+ const L=[...el.children];let raf=0,mx=0;
+ el.addEventListener("mousemove",e=>{mx=e.clientX;if(raf)return;raf=requestAnimationFrame(()=>{raf=0;L.forEach(s=>{const r=s.getBoundingClientRect(),d=mx-(r.left+r.width/2);s.style.fontWeight=Math.round(min+(max-min)*Math.exp(-(d*d)/2400))})})});
+ el.addEventListener("mouseleave",()=>L.forEach(s=>s.style.fontWeight=base))})}
+
+/* =========================================================
+   9. MENU BAR / CONTEXT MENU
+   ========================================================= */
+const activeApp=()=>WM.wins.get(WM.active)?.app||"finder";
+function syncMenu(){$("#mbApp").textContent=APPS[activeApp()].name}
+function menuItems(m){const w=WM.wins.get(WM.active),a=activeApp(),S=null;
+ return {
+  sys:[[BLOG.title+"에 관하여",()=>openApp("settings",{tab:"about"})],S,["시스템 설정…",()=>openApp("settings")],S,["페이지 소스 보기",()=>openApp("source"),"⌥⌘U"],S,["화면 잠금",lock,"⌃⌘Q"]],
+  app:[[APPS[a].name+"에 관하여",()=>notify(APPS[a].name,"기본 앱",APPS[a].icon)],S,["설정…",()=>openApp("settings"),"⌘,"],S,[APPS[a].name+" 가리기",()=>w&&minimize(w.id),"⌘H",!w],[APPS[a].name+" 종료",()=>[...WM.wins.values()].filter(x=>x.app===a).forEach(x=>closeWin(x.id)),"⌘Q",!w]],
+  file:[["새로운 탐색기 윈도우",()=>openApp("finder",{}),"⌘N"],["새로운 터미널",()=>openApp("terminal"),"⌘`"],S,["Markdown 가져오기…",()=>$("#filePick").click(),"⌘O"],S,["윈도우 닫기",()=>w&&closeWin(w.id),"⌥⌘W",!w]],
+  view:[["아이콘으로 보기",()=>w.view("grid"),"⌘1",!(w&&w.view)],["목록으로 보기",()=>w.view("list"),"⌘2",!(w&&w.view)],S,...Object.entries(WALLS).map(([k,v])=>[(wp===k?"✓ ":"  ")+"배경: "+v,()=>setWall(k)]),S,[(document.body.dataset.theme==="dark"?"라이트":"다크")+" 모드로 전환",()=>setTheme(document.body.dataset.theme==="dark"?"light":"dark")]],
+  go:[...FS.children.filter(c=>c.type==="dir").map(c=>[c.name,()=>openApp("finder",{path:[c.id]})]),S,["블로그 홈",()=>openApp("blog",{}),"⇧⌘H"],["최신 글 읽기",()=>latest()&&openPost(latest().slug),"",!latest()]],
+  window:[["최소화",()=>minimize(w.id),"⌘M",!w],["확대/축소",()=>zoom(w.id),"",!w],["모든 윈도우 보기",tileAll,"F3"],["모든 윈도우 닫기",()=>[...WM.wins.keys()].forEach(closeWin)],S,...[...WM.wins.values()].map(x=>[(x.id===WM.active?"✓ ":"  ")+x.title,()=>x.min?restore(x.id):focus(x.id)])],
+  help:[["빠른 검색",openSpot,"⌘K"],["터미널 명령어 보기",()=>{const id=openApp("terminal");setTimeout(()=>{const i=WM.wins.get(id).el.querySelector("input");i.value="help";i.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter"}))},60)}],S,["GitHub — TSK2",()=>window.open("https://github.com/TSK2","_blank","noopener")]]}[m]}
+function showMenu(items,x,y,el){const d=$("#drop");d.innerHTML="";d._items=items;items.forEach((it,i)=>{if(!it)return d.appendChild(document.createElement("hr"));const b=document.createElement("button");b.setAttribute("role","menuitem");b.dataset.i=i;b.innerHTML=`<span>${esc(it[0])}</span><kbd>${it[2]||""}</kbd>`;b.disabled=!!it[3];d.appendChild(b)});
+ d.classList.add("open");d.style.left=Math.max(4,Math.min(x,innerWidth-d.offsetWidth-6))+"px";d.style.top=(y==null?$("#menubar").offsetHeight+2:Math.min(y,innerHeight-d.offsetHeight-6))+"px";
+ $$("#menubar .mi").forEach(m=>m.classList.toggle("on",m===el))}
+$("#drop").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(!b||b.disabled)return;const it=$("#drop")._items[b.dataset.i];closePops();it[1]()});
+let menuOpen=false;
+$$("#menubar [data-menu]").forEach(m=>{
+ m.onclick=e=>{e.stopPropagation();if(m.classList.contains("on"))return closePops();closePops();menuOpen=true;showMenu(menuItems(m.dataset.menu),m.getBoundingClientRect().left,null,m)};
+ m.onmouseenter=()=>{if(menuOpen&&!m.classList.contains("on"))showMenu(menuItems(m.dataset.menu),m.getBoundingClientRect().left,null,m)}});
+function closePops(){$$(".drop").forEach(p=>p.classList.remove("open"));$$("#menubar .mi").forEach(m=>m.classList.remove("on"));menuOpen=false}
+document.addEventListener("pointerdown",e=>{if(!e.target.closest(".drop,#menubar,#spot"))closePops();if(!e.target.closest("#spot,#mbSpot"))closeSpot()});
+desk.addEventListener("contextmenu",e=>{if(e.target.closest(".win"))return;e.preventDefault();closePops();
+ const ic=e.target.closest(".icon"),d=ic&&DESKF().find(x=>"ic-"+x.id===ic.id);
+ showMenu(d?[["열기",d.open],["정보 가져오기",()=>notify(d.label,"데스크탑 바로가기")]]:
+  [["새로운 탐색기 윈도우",()=>openApp("finder",{})],["Markdown 가져오기…",()=>$("#filePick").click()],null,["아이콘 정리",()=>{store.set("icons",{});layoutIcons()}],["여기서 터미널 열기",()=>openApp("terminal")],null,
+   ...Object.entries(WALLS).map(([k,v])=>[(wp===k?"✓ ":"  ")+"배경: "+v,()=>setWall(k)]),null,["페이지 소스 보기",()=>openApp("source")],["시스템 설정…",()=>openApp("settings")]],e.clientX,e.clientY)});
+
+/* =========================================================
+   10. SPOTLIGHT — 파일 트리 + 본문 + 명령을 한 번에 색인
+   ========================================================= */
+let spIdx=0,spRes=[],INDEX=[],spQ="";
+function buildIndex(){INDEX=[...Object.entries(APPS).filter(([,A])=>!A.hidden).map(([a,A])=>({g:"응용 프로그램",t:A.name,s:"",ic:ICON_SVG[A.icon],hay:A.name,go:()=>openApp(a)})),
+ ...POSTS.map(p=>({g:"글",t:p.title,s:p.date+" · "+p.cat,ic:`<div style="transform:scale(.33);transform-origin:0 0;width:26px;height:26px">${thumbHTML(p)}</div>`,hay:(p.title+" "+p.tags.join(" ")+" "+p.cat+" "+textOf(postHTML(p))).toLowerCase(),go:()=>openPost(p.slug)})),
+ ...PROJECTS.map(p=>({g:"프로젝트",t:p.name,s:p.sub,ic:ICON_SVG.project,hay:(p.name+p.sub+p.desc+p.stack.join(" ")).toLowerCase(),go:()=>openApp("project",{id:p.id})})),
+ ...[["다크 모드",()=>setTheme("dark")],["라이트 모드",()=>setTheme("light")],["화면 잠금",lock],["모든 윈도우 보기",tileAll],["페이지 소스 보기",()=>openApp("source")],...Object.entries(WALLS).map(([w,v])=>["배경: "+v,()=>setWall(w)])].map(c=>({g:"명령",t:c[0],s:"",ic:ICON_SVG.settings,hay:c[0].toLowerCase(),go:c[1]}))]}
+function openSpot(){closePops();const s=$("#spot");s.classList.add("open");const i=s.querySelector("input");i.value="";drawSpot();requestAnimationFrame(()=>i.focus())}
+function closeSpot(){$("#spot").classList.remove("open")}
+function drawSpot(){const k=$("#spot input").value.trim().toLowerCase(),R=$("#spot .res");spIdx=0;spQ=k;if(!k){R.innerHTML="";spRes=[];return}
+ const terms=k.split(/\s+/);spRes=INDEX.filter(r=>terms.every(t=>r.hay.toLowerCase().includes(t)||r.t.toLowerCase().includes(t))).slice(0,30);let g="";
+ R.innerHTML=spRes.map((r,i)=>(r.g!==g?`<h6>${g=r.g}</h6>`:"")+`<div class="r ${i===0?"on":""}" data-i="${i}"><div class="ri">${r.ic}</div><div>${esc(r.t)}${r.s?`<small>${esc(r.s)}</small>`:""}</div></div>`).join("")||`<div style="padding:16px;color:var(--muted);text-align:center">결과 없음</div>`}
+const hl=()=>$$("#spot .r").forEach((r,i)=>r.classList.toggle("on",i===spIdx));
+$("#spot input").addEventListener("input",debounce(drawSpot,60));
+$("#spot .res").addEventListener("click",e=>{const r=e.target.closest("[data-i]");if(r){closeSpot();spRes[r.dataset.i].go()}});
+$("#spot .res").addEventListener("mousemove",e=>{const r=e.target.closest("[data-i]");if(r&&+r.dataset.i!==spIdx){spIdx=+r.dataset.i;hl()}});
+$("#spot input").onkeydown=e=>{if(e.key==="ArrowDown"){spIdx=Math.min(spIdx+1,spRes.length-1);hl();e.preventDefault()}else if(e.key==="ArrowUp"){spIdx=Math.max(spIdx-1,0);hl();e.preventDefault()}else if(e.key==="Enter"){if(e.target.value.trim().toLowerCase()!==spQ)drawSpot();if(spRes[spIdx]){closeSpot();spRes[spIdx].go()}}else if(e.key==="Escape")closeSpot()};
+$("#mbSpot").onclick=e=>{e.stopPropagation();$("#spot").classList.contains("open")?closeSpot():openSpot()};
+addEventListener("keydown",e=>{const mod=e.metaKey||e.ctrlKey;
+ if(mod&&(e.key==="k"||e.code==="Space")&&!e.target.closest(".term")){e.preventDefault();openSpot()}
+ else if(mod&&e.key==="`"){e.preventDefault();openApp("terminal")}
+ else if(e.key==="F3"){e.preventDefault();tileAll()}
+ else if(mod&&e.altKey&&e.code==="KeyW"){e.preventDefault();WM.active&&closeWin(WM.active)}
+ else if(e.key==="Escape"){closePops();closeSpot()}});
+
+/* =========================================================
+   11. MARKDOWN IMPORT (드래그 앤 드롭)
+   ========================================================= */
+function importFiles(files){[...files].forEach(f=>{if(!/\.(md|markdown|txt)$/i.test(f.name))return notify("지원하지 않는 형식",esc(f.name)+" — .md / .txt 만 열 수 있습니다");
+ if(f.size>2e6)return notify("파일이 너무 큽니다",esc(f.name)+" (2MB 이하)");
+ const r=new FileReader();r.onload=()=>{const txt=String(r.result),m=txt.match(/^#\s+(.+)$/m),title=(m?m[1]:f.name.replace(/\.\w+$/,"")).slice(0,80);
+  const slug="local-"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  POSTS.unshift({slug,title,date:new Date().toISOString().slice(0,10),cat:"가져온 글",tags:["로컬"],read:Math.max(1,Math.round(txt.length/600)),body:plainMd(txt.replace(/^#\s+.+$/m,""))});
+  FS=buildFS();buildIndex();WM.wins.forEach(w=>w.redraw&&w.redraw());openPost(slug);notify("글 가져옴",esc(f.name)+" (이 브라우저에서만 보입니다)","blog")};r.readAsText(f)})}
+$("#filePick").onchange=e=>{importFiles(e.target.files);e.target.value=""};
+document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>{e.preventDefault();if(!e.target.closest(".finder"))importFiles(e.dataTransfer.files)});
+
+/* =========================================================
+   12. MENU-BAR WIDGETS: 시계·달력·제어 센터·실제 배터리
+   ========================================================= */
+const fmtClock=new Intl.DateTimeFormat("ko-KR",{month:"long",day:"numeric",weekday:"short",hour:"numeric",minute:"2-digit"});
+let lastMin=-1;const tick=()=>{const d=new Date();if(d.getMinutes()!==lastMin||$("#lock").classList.contains("open")){lastMin=d.getMinutes();$("#mbClock").textContent=fmtClock.format(d).replace(/,/g,"");
+ if($("#lock").classList.contains("open")){$("#lock .d").textContent=d.toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"long"});$("#lock .t").textContent=d.toLocaleTimeString("ko-KR",{hour:"numeric",minute:"2-digit",hour12:false})}}};
+tick();setInterval(tick,1000);
+let calOff=0;function drawCal(){const n=new Date(),v=new Date(n.getFullYear(),n.getMonth()+calOff,1),c=$("#calpop");
+ const first=v.getDay(),days=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(),prev=new Date(v.getFullYear(),v.getMonth(),0).getDate(),cells=[];
+ const ym=`${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,"0")}`,postDays=new Set(POSTS.filter(p=>p.date.startsWith(ym)).map(p=>+p.date.slice(8)));
+ for(let i=first-1;i>=0;i--)cells.push(`<td class="o">${prev-i}</td>`);for(let d=1;d<=days;d++)cells.push(`<td class="${calOff===0&&d===n.getDate()?"t":""}"><span ${postDays.has(d)?'style="box-shadow:inset 0 -2px 0 var(--accent)"':""}>${d}</span></td>`);let k=1;while(cells.length%7)cells.push(`<td class="o">${k++}</td>`);
+ let rows="";for(let i=0;i<cells.length;i+=7)rows+="<tr>"+cells.slice(i,i+7).join("")+"</tr>";const posted=POSTS.filter(p=>p.date.startsWith(ym));
+ c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:#ff5f57">${v.getFullYear()}년 ${v.getMonth()+1}월</b><span><button class="tbtn" data-m="-1" aria-label="이전 달">‹</button><button class="tbtn" data-m="1" aria-label="다음 달">›</button></span></div><table><tr>${"일월화수목금토".split("").map(d=>`<th>${d}</th>`).join("")}</tr>${rows}</table>
+  <div style="margin-top:10px;border-top:.5px solid var(--line);padding-top:8px;font-size:12px"><div style="color:var(--muted);margin-bottom:4px">이 달에 쓴 글 ${posted.length}편</div>${posted.map(p=>`<button class="tbtn" style="display:block;width:100%;text-align:left;padding:3px 6px;height:auto;color:var(--text)" data-s="${p.slug}">• ${esc(p.title)}</button>`).join("")}</div>`}
+$("#calpop").addEventListener("click",e=>{const m=e.target.closest("[data-m]");if(m){calOff+=+m.dataset.m;return drawCal()}const s=e.target.closest("[data-s]");if(s){closePops();openPost(s.dataset.s)}});
+$("#mbClock").onclick=e=>{e.stopPropagation();const c=$("#calpop"),o=c.classList.contains("open");closePops();if(!o){calOff=0;drawCal();c.classList.add("open")}};
+const SV={moon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>',wifi:'<svg width="14" height="12" viewBox="0 0 24 18" fill="currentColor"><path d="M12 18l3.5-4.2a5.5 5.5 0 00-7 0zM12 9.5a10 10 0 016.4 2.3l2-2.4a13 13 0 00-16.8 0l2 2.4A10 10 0 0112 9.5z"/></svg>',half:'<svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 010 18z" fill="currentColor"/></svg>',lock:'<svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>'};
+function drawCC(){const c=$("#cc"),dark=document.body.dataset.theme==="dark";
+ c.innerHTML=`<div class="row2"><div class="tile"><button class="tg ${DND?"on":""}" data-cc="dnd"><span class="c">${SV.moon}</span><div style="text-align:left"><b>방해 금지</b><br><small style="color:var(--muted)">${DND?"켬":"끔"}</small></div></button><div class="tg on"><span class="c">${SV.wifi}</span><div><b>Wi-Fi</b><br><small style="color:var(--muted)">TSK-SEC</small></div></div></div>
+  <div class="tile"><button class="tg ${dark?"on":""}" data-cc="dark"><span class="c">${SV.half}</span><div style="text-align:left"><b>다크 모드</b><br><small style="color:var(--muted)">${dark?"켬":"끔"}</small></div></button><button class="tg" data-cc="lock"><span class="c">${SV.lock}</span><div style="text-align:left"><b>화면 잠금</b></div></button></div></div>
+  <div class="tile"><b>배경화면</b><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${Object.entries(WALLS).map(([k,v])=>`<button class="btn ${wp===k?"pri":""}" data-w="${k}">${v}</button>`).join("")}</div></div>
+  <div class="tile"><b>블로그 통계</b><div style="font-size:12px;color:var(--muted);margin-top:6px">글 ${POSTS.length}편 · 태그 ${new Set(POSTS.flatMap(p=>p.tags)).size}개 · 최근 업데이트 ${latest()?.date||"—"}</div></div>`}
+$("#cc").addEventListener("click",e=>{const b=e.target.closest("[data-cc],[data-w]");if(!b)return;if(b.dataset.cc==="dnd"){DND=!DND;store.set("dnd",DND)}else if(b.dataset.cc==="dark")setTheme(document.body.dataset.theme==="dark"?"light":"dark");else if(b.dataset.cc==="lock"){closePops();return lock()}else setWall(b.dataset.w);drawCC()});
+$("#mbCC").onclick=e=>{e.stopPropagation();const c=$("#cc"),o=c.classList.contains("open");closePops();if(!o){drawCC();c.classList.add("open")}};
+/* 실제 배터리 (Battery Status API 지원 브라우저만) */
+(async()=>{try{if(!navigator.getBattery)return;const b=await navigator.getBattery();const up=()=>{const p=Math.round(b.level*100);$("#batPct").textContent=p+"%";$("#batFill").setAttribute("width",Math.max(1,19*b.level));$("#batFill").setAttribute("fill",p<=20&&!b.charging?"#ff5f57":"currentColor");$("#mbBat").title=`배터리 ${p}%${b.charging?" (충전 중)":""}`};up();b.addEventListener("levelchange",up);b.addEventListener("chargingchange",up)}catch{}})();
+function lock(){const l=$("#lock");l.classList.add("open");lastMin=-1;tick();const un=()=>{l.classList.remove("open");removeEventListener("keydown",un);l.onclick=null};l.onclick=un;setTimeout(()=>addEventListener("keydown",un),50)}
+
+/* =========================================================
+   13. TISTORY ADAPTER — 티스토리 스킨에 들어가면 RSS와 현재 페이지에서 글을 자동으로 읽음
+   ========================================================= */
+const normDate=s=>{const m=String(s||"").match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);return m?`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`:""};
+function mkPost({link,title,date,cat,tags=[],html=""}){const u=new URL(link,location.href),seg=decodeURIComponent(u.pathname.split("/").filter(Boolean).pop()||"post");
+ const tmp=document.createElement("div");tmp.innerHTML=html;const img=tmp.querySelector("img[src]");const len=tmp.textContent.replace(/\s+/g,"").length;
+ return{slug:decodeURI(u.pathname),file:seg.replace(/\s+/g,"-")+".md",link:u.href,title:title||"(제목 없음)",date:normDate(date)||date||"",cat:cat||"미분류",tags,html,thumb:img?img.getAttribute("src"):null,read:Math.max(1,Math.round(len/500))}}
+const samePath=(a,b)=>{try{return decodeURI(new URL(a,location.href).pathname)===decodeURI(new URL(b,location.href).pathname)}catch{return false}};
+async function loadTistory(){
+ const tx=(el,s)=>el?.querySelector(s)?.textContent.trim()||"";const bl=TT.querySelector("#tt-blog");BLOG.title=tx(TT,"#tt-blog .tt-bt")||BLOG.title;BLOG.desc=tx(TT,"#tt-blog .tt-bd")||BLOG.desc;BLOG.link=bl?.dataset.link||location.origin+"/";BLOG.host=location.host;
+ INITIAL={type:document.body.id,conform:tx(TT,"#tt-list .tt-conform")};
+ let list=[];
+ /* 1) RSS: 같은 도메인이라 CORS 문제 없음. 실패해도 아래 대체 경로로 동작 */
+ try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);
+  const r=await fetch(new URL("rss",BLOG.link.replace(/\/?$/,"/")),{signal:ctl.signal,credentials:"same-origin"});
+  if(r.ok){const x=new DOMParser().parseFromString(await r.text(),"text/xml");
+   list=[...x.querySelectorAll("item")].map(it=>{const cats=[...it.querySelectorAll("category")].map(c=>c.textContent.trim()).filter(Boolean);const pd=new Date(it.querySelector("pubDate")?.textContent||"");
+    return mkPost({link:it.querySelector("link")?.textContent.trim()||"/",title:it.querySelector("title")?.textContent.trim(),date:isNaN(pd)?"":`${pd.getFullYear()}-${String(pd.getMonth()+1).padStart(2,"0")}-${String(pd.getDate()).padStart(2,"0")}`,cat:cats[0],tags:cats.slice(1),html:it.querySelector("description")?.textContent||""})})}}catch{}
+ /* 2) 홈·목록 페이지에 서버가 그려준 글 목록 (RSS가 꺼져 있을 때 대체) */
+ TT.querySelectorAll(".tt-item").forEach(a=>{if(!list.some(p=>samePath(p.link,a.getAttribute("href"))))list.push(mkPost({link:a.getAttribute("href"),title:tx(a,".tt-t"),date:tx(a,".tt-d"),cat:tx(a,".tt-c"),html:a.querySelector(".tt-s")?.innerHTML||""}))});
+ /* 3) 지금 보고 있는 글(퍼머링크): 본문+댓글 DOM을 그대로 창 안으로 옮김 */
+ const art=TT.querySelector(".tt-article");
+ if(art){let p=list.find(x=>samePath(x.link,art.dataset.link));
+  if(!p){p=mkPost({link:art.dataset.link||location.href,title:tx(art,".tt-head .tt-t"),date:tx(art,".tt-head .tt-d"),cat:tx(art,".tt-head .tt-c")});list.unshift(p)}
+  p.html=art.querySelector(".tt-desc")?.innerHTML||p.html;{const dt=[...art.querySelectorAll(".tt-tags a")].map(a=>a.textContent.trim()).filter(Boolean);if(dt.length)p.tags=dt}
+  const tmp=document.createElement("div");tmp.innerHTML=p.html;p.read=Math.max(1,Math.round(tmp.textContent.replace(/\s+/g,"").length/500));p.sum=null;
+  art.querySelector(".tt-head")?.remove();p.node=art;CURRENT=p.slug}
+ POSTS=list;WRITEUPS=[];}
+
+/* =========================================================
+   14. BOOT — 첫 방문만 부팅 로그, 재방문은 즉시 (건너뛰기 가능)
+   ========================================================= */
+{const a=store.get("accent");setAccent(a||"#0a84ff");const t=store.get("theme");if(t)document.body.dataset.theme=t}
+resize();buildDock();syncMenu();
+addEventListener("resize",debounce(()=>{layoutIcons();if(mobile())WM.wins.forEach(w=>w.el.classList.add("max"))},150));
+if(!TT)addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(POSTS.some(p=>p.slug===h))openPost(h)});
+const FEED=document.documentElement.dataset.feed;
+/* GitHub Pages 등 외부 호스팅: GitHub Actions가 티스토리 RSS를 posts.json으로 저장해 두면 그걸 읽음 */
+async function loadFeed(){try{const r=await fetch(FEED,{cache:"no-cache"});const d=await r.json();if(d.blog){BLOG.title=d.blog.title||BLOG.title;BLOG.desc=d.blog.desc||BLOG.desc;BLOG.link=d.blog.link||BLOG.link}
+ POSTS=(d.posts||[]).map(it=>Object.assign(mkPost({link:it.link,title:it.title,date:it.date,cat:(it.categories||[])[0],tags:(it.categories||[]).slice(1),html:it.html||""}),{ext:true}))}catch{POSTS=[]}WRITEUPS=[];BLOG.host=location.host}
+const ready=(TT?loadTistory():FEED?loadFeed():Promise.resolve()).then(()=>{FS=buildFS();buildIndex();layoutIcons();const ht=$("#hero .ttl");if(ht&&!ht.dataset.fixed)ht.textContent=BLOG.title;setupHero()});
+function startDesktop(){const sess=store.get("session",[]);
+ sess.forEach(s=>{if(!APPS[s.app]||(s.app==="project"&&!PROJECTS.some(p=>p.id===s.arg?.id)))return;if(s.app==="blog"&&s.arg?.slug&&!findPost(s.arg.slug))s.arg={};const id=openApp(s.app,s.arg||{},s);if(s.min)minimize(id)});
+ const h=TT?CURRENT:decodeURIComponent(location.hash.slice(1));
+ if(h&&findPost(h))return openPost(findPost(h).slug);
+ if(TT&&/category|tag/.test(INITIAL.type)&&INITIAL.conform)return openApp("blog",{filter:INITIAL.conform});
+ if(TT&&INITIAL.type==="tt-body-search"&&INITIAL.conform){openSpot();const i=$("#spot input");i.value=INITIAL.conform;return drawSpot()}
+ if(!sess.length){openApp("finder",{path:["posts"]});setTimeout(()=>notify(`${esc(BLOG.title)}에 오신 걸 환영합니다`,"<b style='display:inline'>⌘/Ctrl+K</b>로 검색하고, 아이콘을 더블클릭해 둘러보세요."),500)}}
+(()=>{const boot=$("#boot"),log=boot.querySelector(".bootlog"),first=(()=>{try{return !sessionStorage.getItem("tsk3-booted")}catch{return true}})();let done=false;
+ const finish=async()=>{if(done)return;done=true;try{sessionStorage.setItem("tsk3-booted","1")}catch{}removeEventListener("keydown",finish);await ready;boot.style.opacity=0;setTimeout(()=>boot.remove(),400);startDesktop()};
+ boot.addEventListener("click",finish);addEventListener("keydown",finish);
+ if(!first||reduceMotion){boot.querySelector(".bar i").style.animationDuration=".3s";return setTimeout(finish,300)}
+ const steps=["Waking up","Brewing coffee","Mounting /home/tsk","Loading posts","Arranging desktop icons","Ready"];
+ steps.forEach((s,i)=>setTimeout(()=>{if(!done)log.insertAdjacentHTML("beforeend",`<div><span class="ok">[  OK  ]</span> ${s}</div>`)},i*160));setTimeout(finish,steps.length*160+250)})();
+</script>
+</body>
+</html>
