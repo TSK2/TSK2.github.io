@@ -6,6 +6,20 @@
  },
  "posts": [
   {
+   "title": "[개발 일지] 맥북 메뉴바 RAM 모니터 RAMBar 만들기",
+   "link": "https://ts2k.tistory.com/entry/%EA%B0%9C%EB%B0%9C-%EC%9D%BC%EC%A7%80-%EB%A7%A5%EB%B6%81-%EB%A9%94%EB%89%B4%EB%B0%94-RAM-%EB%AA%A8%EB%8B%88%ED%84%B0-RAMBar-%EB%A7%8C%EB%93%A4%EA%B8%B0-1",
+   "date": "2026-11-24",
+   "categories": [
+    "프로젝트",
+    "AppKit",
+    "MacOS",
+    "Swift",
+    "개발일지",
+    "메뉴바앱"
+   ],
+   "html": "맥북 메뉴바에 메모리 상태를 실시간으로 띄우는 작은 앱 RAMBar를 만들었습니다. 메뉴바에 ● 72%처럼 점 하나와 숫자 하나만 보이는, 아주 가벼운 앱입니다.\n1. 만들게 된 동기\n\n램이 넉넉하지 않은 맥북이라 메모리 상황을 자주 확인해야 했습니다.\n그때마다 활성 상태 보기(Activity Monitor)를 열어 확인하는 게 번거로웠습니다.\n기존 시스템 모니터 앱들은 기능이 너무 많았습니다. 메뉴바에서 한눈에 보고, 필요하면 바로 앱을 정리하는 것만.."
+  },
+  {
    "title": "[개발 일지] 3D 틸트 홀로그램 카드 iOS 앱 HoloCards 만들기",
    "link": "https://ts2k.tistory.com/entry/%EA%B0%9C%EB%B0%9C-%EC%9D%BC%EC%A7%80-3D-%ED%8B%B8%ED%8A%B8-%ED%99%80%EB%A1%9C%EA%B7%B8%EB%9E%A8-%EC%B9%B4%EB%93%9C-iOS-%EC%95%B1-HoloCards-%EB%A7%8C%EB%93%A4%EA%B8%B0-1",
    "date": "2026-11-23",
