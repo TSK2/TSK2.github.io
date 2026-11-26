@@ -719,7 +719,7 @@ function renderBlog(body,w,arg){
  function article(p){w.setTitle(p.title);const i=POSTS.indexOf(p),n=POSTS.length;
   body.innerHTML=`<div class="reader" style="flex-direction:column"><div style="display:flex;flex:1;min-height:0"><nav style="${tocOn?"":"display:none"}"><h5>목차</h5></nav>
    <div class="scroll"><div class="progress"></div><article class="post" style="font-size:${fs}px"><div class="meta">${esc(p.date)} · ${esc(p.cat)} · ${p.read}분 읽기</div><h1>${esc(p.title)}</h1><div class="tags">${p.tags.map(t=>`<span>#${esc(t)}</span>`).join("")}</div><div class="content"></div>
-   ${(TT&&!p.node)||p.ext?`<div class="card" style="margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px"><span>${p.ext?"티스토리 원문에서 댓글을 남길 수 있어요.":"댓글과 공감은 원문 페이지에서 볼 수 있어요."}</span><a class="btn pri" style="text-decoration:none" href="${esc(p.link)}"${p.ext?' target="_blank" rel="noopener"':""}>${p.ext?"티스토리에서 보기":"원문 · 댓글 보기"}</a></div>`:""}
+   ${(TT&&!p.node)||p.ext?`<div class="card" style="margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px"><span>${p.ext?(p.full?"댓글과 공감은 티스토리에서 남길 수 있어요.":"여기에는 요약만 있어요. 전체 글은 티스토리에서 볼 수 있어요."):"댓글과 공감은 원문 페이지에서 볼 수 있어요."}</span><a class="btn pri" style="text-decoration:none" href="${esc(p.link)}"${p.ext?' target="_blank" rel="noopener"':""}>${p.ext?(p.full?"티스토리에서 댓글 보기":"티스토리에서 전체 보기"):"원문 · 댓글 보기"}</a></div>`:""}
    <hr style="border:0;border-top:1px solid var(--line);margin:40px 0 16px"><div class="btns">${n>1?`<button class="btn" data-s="${esc(POSTS[(i-1+n)%n].slug)}">← 이전 글</button>`:""}<button class="btn" data-home>목록</button>${n>1?`<button class="btn pri" data-s="${esc(POSTS[(i+1)%n].slug)}">다음 글 →</button>`:""}</div></article></div></div>
    <div class="rstatus"><span class="wc"></span><span class="pct">0%</span></div></div>`;
   const content=body.querySelector(".content");
@@ -1007,7 +1007,7 @@ if(!TT)addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(POST
 const FEED=document.documentElement.dataset.feed;
 /* GitHub Pages 등 외부 호스팅: GitHub Actions가 티스토리 RSS를 posts.json으로 저장해 두면 그걸 읽음 */
 async function loadFeed(){try{const r=await fetch(FEED,{cache:"no-cache"});const d=await r.json();if(d.blog){BLOG.title=d.blog.title||BLOG.title;BLOG.desc=d.blog.desc||BLOG.desc;BLOG.link=d.blog.link||BLOG.link}
- POSTS=(d.posts||[]).map(it=>Object.assign(mkPost({link:it.link,title:it.title,date:it.date,cat:(it.categories||[])[0],tags:(it.categories||[]).slice(1),html:it.html||""}),{ext:true}))}catch{POSTS=[]}WRITEUPS=[];BLOG.host=location.host}
+ POSTS=(d.posts||[]).map(it=>Object.assign(mkPost({link:it.link,title:it.title,date:it.date,cat:(it.categories||[])[0],tags:(it.categories||[]).slice(1),html:it.html||""}),{ext:true,full:it.full!==false}))}catch{POSTS=[]}WRITEUPS=[];BLOG.host=location.host}
 const ready=(TT?loadTistory():FEED?loadFeed():Promise.resolve()).then(()=>{FS=buildFS();buildIndex();layoutIcons();const ht=$("#hero .ttl");if(ht&&!ht.dataset.fixed)ht.textContent=BLOG.title;setupHero()});
 function startDesktop(){const sess=store.get("session",[]);
  sess.forEach(s=>{if(!APPS[s.app]||(s.app==="project"&&!PROJECTS.some(p=>p.id===s.arg?.id)))return;if(s.app==="blog"&&s.arg?.slug&&!findPost(s.arg.slug))s.arg={};const id=openApp(s.app,s.arg||{},s);if(s.min)minimize(id)});
