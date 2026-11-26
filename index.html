@@ -701,7 +701,7 @@ function renderBlog(body,w,arg){
  tb.querySelector(".tl").insertAdjacentHTML("afterend",`<button class="tbtn bk" aria-label="뒤로" style="margin-left:10px"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 1L2 7l6 6"/></svg></button><button class="tbtn fw" aria-label="앞으로"><svg width="9" height="14" viewBox="0 0 9 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l6 6-6 6"/></svg></button><div class="addr"></div>`);
  let hist=[],hp=-1,fs=store.get("fontSize",15),tocOn=innerWidth>=900,filter=arg.filter||"전체";
  const lockIco=`<svg width="10" height="12" viewBox="0 0 24 28" fill="currentColor"><rect x="2" y="12" width="20" height="15" rx="3"/><path d="M6 12V8a6 6 0 0112 0v4" fill="none" stroke="currentColor" stroke-width="3"/></svg>`;
- function setURL(p){if(TT){const path=p?new URL(p.link,location.href).pathname:"/";if(location.pathname!==path)try{history.replaceState(null,"",path)}catch{}}
+ function setURL(p){/* 글을 열어도 주소창을 글 주소로 바꾸지 않음 → 재방문·새로고침 때 글 창이 저절로 뜨지 않음 (공유는 공유 버튼 사용) */if(p)return;if(TT){const path=p?new URL(p.link,location.href).pathname:"/";if(location.pathname!==path)try{history.replaceState(null,"",path)}catch{}}
   else if(p)history.replaceState(null,"","#"+p.slug);else if(location.hash)history.replaceState(null,"",location.pathname+location.search)}
  function show(slug,push=true){const p=slug?findPost(slug):null;slug=p?p.slug:null;w.arg=slug?{slug}:{};persist();
   if(push){hist=hist.slice(0,hp+1);hist.push(slug);hp=hist.length-1}
@@ -1003,19 +1003,20 @@ async function loadTistory(){
 {const a=store.get("accent");setAccent(a||"#0a84ff");const t=store.get("theme");if(t)document.body.dataset.theme=t}
 resize();buildDock();syncMenu();
 addEventListener("resize",debounce(()=>{layoutIcons();if(mobile())WM.wins.forEach(w=>w.el.classList.add("max"))},150));
-if(!TT)addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(POSTS.some(p=>p.slug===h))openPost(h)});
+if(!TT)addEventListener("hashchange",()=>{const h=decodeURIComponent(location.hash.slice(1));if(POSTS.some(p=>p.slug===h))openPost(h)});
 const FEED=document.documentElement.dataset.feed;
 /* GitHub Pages 등 외부 호스팅: GitHub Actions가 티스토리 RSS를 posts.json으로 저장해 두면 그걸 읽음 */
 async function loadFeed(){try{const r=await fetch(FEED,{cache:"no-cache"});const d=await r.json();if(d.blog){BLOG.title=d.blog.title||BLOG.title;BLOG.desc=d.blog.desc||BLOG.desc;BLOG.link=d.blog.link||BLOG.link}
  POSTS=(d.posts||[]).map(it=>Object.assign(mkPost({link:it.link,title:it.title,date:it.date,cat:(it.categories||[])[0],tags:(it.categories||[]).slice(1),html:it.html||""}),{ext:true,full:it.full!==false}))}catch{POSTS=[]}WRITEUPS=[];BLOG.host=location.host}
 const ready=(TT?loadTistory():FEED?loadFeed():Promise.resolve()).then(()=>{FS=buildFS();buildIndex();layoutIcons();const ht=$("#hero .ttl");if(ht&&!ht.dataset.fixed)ht.textContent=BLOG.title;setupHero()});
-function startDesktop(){const sess=store.get("session",[]);
- sess.forEach(s=>{if(!APPS[s.app]||(s.app==="project"&&!PROJECTS.some(p=>p.id===s.arg?.id)))return;if(s.app==="blog"&&s.arg?.slug&&!findPost(s.arg.slug))s.arg={};const id=openApp(s.app,s.arg||{},s);if(s.min)minimize(id)});
+/* 시작 시 창을 자동으로 열지 않음: 지난 세션 복원·기본 폴더 열기 없이 깨끗한 바탕화면.
+   글 주소(퍼머링크/#슬러그)·카테고리·검색으로 들어온 경우에만 해당 창을 연다. */
+function startDesktop(){
  const h=TT?CURRENT:decodeURIComponent(location.hash.slice(1));
  if(h&&findPost(h))return openPost(findPost(h).slug);
  if(TT&&/category|tag/.test(INITIAL.type)&&INITIAL.conform)return openApp("blog",{filter:INITIAL.conform});
  if(TT&&INITIAL.type==="tt-body-search"&&INITIAL.conform){openSpot();const i=$("#spot input");i.value=INITIAL.conform;return drawSpot()}
- if(!sess.length){openApp("finder",{path:["posts"]});setTimeout(()=>notify(`${esc(BLOG.title)}에 오신 걸 환영합니다`,"<b style='display:inline'>⌘/Ctrl+K</b>로 검색하고, 아이콘을 더블클릭해 둘러보세요."),500)}}
+ if(!store.get("welcomed")){store.set("welcomed",1);setTimeout(()=>notify(`${esc(BLOG.title)}에 오신 걸 환영합니다`,"<b style='display:inline'>⌘/Ctrl+K</b>로 검색하고, 아이콘을 더블클릭해 둘러보세요."),500)}}
 (()=>{const boot=$("#boot"),log=boot.querySelector(".bootlog"),first=(()=>{try{return !sessionStorage.getItem("tsk3-booted")}catch{return true}})();let done=false;
  const finish=async()=>{if(done)return;done=true;try{sessionStorage.setItem("tsk3-booted","1")}catch{}removeEventListener("keydown",finish);await ready;boot.style.opacity=0;setTimeout(()=>boot.remove(),400);startDesktop()};
  boot.addEventListener("click",finish);addEventListener("keydown",finish);
